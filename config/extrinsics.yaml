@@ -1,0 +1,66 @@
+# Sensor extrinsics and intrinsics for the reference cell.
+#
+# Every transform is named T_parent_child and maps a point in the child frame
+# into the parent: p_parent = T_parent_child @ p_child.  Frames are defined in
+# src/szp/types.py and the loader refuses anything it cannot chain together.
+#
+# WHERE THESE NUMBERS COME FROM
+#   This is the reference configuration for the synthetic cell in
+#   src/szp/data/synthetic.py, so the values here are exact by construction and
+#   the residual in docs/calibration.md is the calibration routine recovering
+#   them from simulated checkerboard observations.  On real hardware you
+#   replace this file with the output of scripts/calibrate.py, which writes the
+#   same schema and fills in meta.residual_rms_m.
+#
+#   Do not hand-edit rotations.  A rotation matrix that is a millidegree off
+#   orthonormal is rejected on load, on purpose: see geometry.se3.
+
+meta:
+  source: reference cell, synthetic
+  calibrated: "2026-08-21"
+  residual_rms_m: null       # filled in by scripts/calibrate.py on real data
+  notes: >
+    Camera on the gantry above and behind the machine, tilted 18 degrees down.
+    Lidar on the guard rail at 0.45 m, which is knee height: high enough to
+    miss most floor clutter, low enough that it still sees a person who has
+    crouched.  The height is a compromise and it is entry FM-05 in the FMEA.
+
+cameras:
+  camera:
+    fx: 525.0
+    fy: 525.0
+    cx: 319.5
+    cy: 239.5
+    width: 640
+    height: 480
+    distortion: []            # rectified stream; see docs/calibration.md
+
+transforms:
+  # World -> camera.  The camera looks along world +x, tilted down 18 degrees.
+  # Expressed as a quaternion because the rpy round trip through the OpenCV
+  # axis convention is the sort of thing that gets flipped in review.
+  - parent: world
+    child: camera
+    translation: [-1.0, 0.0, 2.6]
+    quaternion: [0.4156269, -0.5720614, 0.5720614, -0.4156269]
+
+  # World -> lidar.  Axis-aligned with the world, on the guard rail.
+  - parent: world
+    child: lidar
+    translation: [-0.6, 0.0, 0.45]
+    rpy: [0.0, 0.0, 0.0]
+
+  # World -> machine base.  The machine sits at the origin of the cell.
+  - parent: world
+    child: base
+    translation: [0.0, 0.0, 0.0]
+    rpy: [0.0, 0.0, 0.0]
+
+  # Camera -> depth.  The depth stream is aligned to the colour stream by the
+  # camera driver, so this is identity.  It is written out rather than omitted
+  # because an unregistered depth stream is a common and silent misconfiguration
+  # and this line is where you would fix it.
+  - parent: camera
+    child: depth
+    translation: [0.0, 0.0, 0.0]
+    rpy: [0.0, 0.0, 0.0]

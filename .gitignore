@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Model weights and exported engines.  Weights come from scripts/fetch_model.py,
+# engines are machine-specific and must never be committed: a TensorRT plan is
+# tied to the exact GPU, driver and TRT version that built it.
+models/
+*.pt
+*.onnx
+*.engine
+*.plan
+
+# Datasets live outside the repository.  scripts/fetch_data.py puts them in
+# $SZP_DATA_ROOT (default ~/datasets).
+data/coco/
+datasets/
+
+# Run outputs.  results/published/ is tracked and is the exception.
+results/*
+!results/.gitkeep
+!results/published/
+!results/published/**
+docs/figures/*.tmp.*
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

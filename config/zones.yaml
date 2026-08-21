@@ -1,0 +1,91 @@
+# Safety zones for the reference cell.  Read docs/zones.md before editing.
+#
+# Coordinates are metres in the world frame: +x away from the camera, +y left,
+# z up with the floor at z = 0.  Polygons are plan view and may be concave.
+# The loader rejects a file that is malformed rather than warning about it, so
+# a mistake here is a start-up failure and not a silent gap in the guarding.
+#
+# THE ONE THING TO GET RIGHT
+#   A zone is not the danger area.  It is the danger area plus the distance the
+#   machine travels while it is stopping plus the distance a person covers in
+#   the reaction time.  ISO 13855 gives the formula; docs/zones.md works
+#   through it for this cell and shows where the 0.55 m of margin below comes
+#   from.  Shrinking a zone to reduce nuisance stops moves that margin onto the
+#   person.
+
+frame: world
+
+meta:
+  cell: reference cell (synthetic)
+  reaction_time_ms: 100        # p99 end to end, from analysis/latency_budget.py
+  machine_stop_time_ms: 250    # assumed for this cell; measure it on real plant
+  walking_speed_mps: 1.6       # ISO 13855 approach speed
+  notes: >
+    margin_m on the stop zone is (reaction + stop time) x walking speed
+    = 0.35 s x 1.6 m/s = 0.56 m, rounded to 0.55 and applied as a uniform
+    dilation.  sigma_k then adds two standard deviations of the per-detection
+    position uncertainty on top, so a poorly ranged person is treated as
+    occupying more floor rather than less.
+
+zones:
+  # The machine itself.  L-shaped because the operator station occupies the
+  # near-left corner and does not need guarding to the same envelope; a
+  # rectangle here would have generated a nuisance stop every time somebody
+  # stood at the panel.
+  - id: machine_envelope
+    kind: stop
+    description: reach envelope of the machine, plus the operator station notch
+    polygon:
+      - [2.60, -1.00]
+      - [4.80, -1.00]
+      - [4.80, 0.20]
+      - [3.80, 0.20]
+      - [3.80, 1.20]
+      - [2.60, 1.20]
+    z_min_m: 0.0
+    z_max_m: 2.20
+    margin_m: 0.55
+    sigma_k: 2.0
+    enter_frames: 1
+    exit_frames: 5
+    enabled: true
+
+  # A second stop zone that nothing in the reference scene ever enters.  It is
+  # here on purpose: a zone that never trips is how the analysis measures the
+  # false-stop rate and a configuration with only one zone would not show
+  # whether occupancy is leaking between them.
+  - id: feed_chute
+    kind: stop
+    description: material feed chute, no pedestrian access
+    polygon:
+      - [5.60, -3.40]
+      - [7.00, -3.40]
+      - [7.00, -2.00]
+      - [5.60, -2.00]
+    z_min_m: 0.0
+    z_max_m: 2.20
+    margin_m: 0.30
+    sigma_k: 2.0
+    enter_frames: 1
+    exit_frames: 5
+    enabled: true
+
+  # Warning ring.  Motion is still permitted here; the PLC derates speed.
+  # exit_frames is longer than the stop zone's because a warn-to-clear
+  # transition that flickers is an annoyance rather than a hazard and a longer
+  # debounce costs nothing.
+  - id: approach_corridor
+    kind: warn
+    description: approach to the cell; speed derate, no stop
+    polygon:
+      - [1.20, -2.60]
+      - [6.20, -2.60]
+      - [6.20, 2.60]
+      - [1.20, 2.60]
+    z_min_m: 0.0
+    z_max_m: 2.20
+    margin_m: 0.00
+    sigma_k: 1.0
+    enter_frames: 1
+    exit_frames: 10
+    enabled: true

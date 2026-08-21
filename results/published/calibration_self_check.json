@@ -1,0 +1,19 @@
+{
+  "camera_lidar": {
+    "rms_m": 0.008454685514708456,
+    "max_abs_m": 0.022908871572720146,
+    "linear_rms_m": 0.046710717809146415,
+    "n_observations": 7,
+    "n_points": 175,
+    "converged": true,
+    "translation_m": [
+      0.01951612135109479,
+      -0.30679127754751717,
+      0.12830565691814855
+    ]
+  },
+  "self_check": {
+    "translation_error_m": 0.008917060904015534,
+    "rotation_error_deg": 0.051438289226773536
+  }
+}

@@ -1,0 +1,628 @@
+{
+  "images_scored": 5000,
+  "iou_threshold": 0.5,
+  "min_height_px": 50.0,
+  "detector": {
+    "backend": "onnx",
+    "model": "yolov8n.onnx",
+    "model_sha256_prefix": "a496d1e248b472ee",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "input_size": [
+      640,
+      640
+    ],
+    "conf_threshold": 0.05,
+    "iou_threshold": 0.55,
+    "onnxruntime": "1.29.0"
+  },
+  "sweep": [],
+  "all": {
+    "height_floor_px": 0.0,
+    "people": 10777,
+    "sweep": [
+      {
+        "conf": 0.05,
+        "people": 10777,
+        "found": 8676,
+        "missed": 2101,
+        "recall": 0.8050477869536977,
+        "false_positives": 7017,
+        "false_positives_per_image": 1.4034,
+        "detections_in_crowd_ignored": 3384,
+        "precision": 0.5528579621487287
+      },
+      {
+        "conf": 0.1,
+        "people": 10777,
+        "found": 8166,
+        "missed": 2611,
+        "recall": 0.7577247842627819,
+        "false_positives": 3534,
+        "false_positives_per_image": 0.7068,
+        "detections_in_crowd_ignored": 1898,
+        "precision": 0.6979487179487179
+      },
+      {
+        "conf": 0.15,
+        "people": 10777,
+        "found": 7831,
+        "missed": 2946,
+        "recall": 0.726640066808945,
+        "false_positives": 2263,
+        "false_positives_per_image": 0.4526,
+        "detections_in_crowd_ignored": 1263,
+        "precision": 0.7758074103427779
+      },
+      {
+        "conf": 0.2,
+        "people": 10777,
+        "found": 7526,
+        "missed": 3251,
+        "recall": 0.6983390553957503,
+        "false_positives": 1527,
+        "false_positives_per_image": 0.3054,
+        "detections_in_crowd_ignored": 958,
+        "precision": 0.8313266320556721
+      },
+      {
+        "conf": 0.25,
+        "people": 10777,
+        "found": 7212,
+        "missed": 3565,
+        "recall": 0.6692029321703629,
+        "false_positives": 1112,
+        "false_positives_per_image": 0.2224,
+        "detections_in_crowd_ignored": 719,
+        "precision": 0.8664103796251802
+      },
+      {
+        "conf": 0.3,
+        "people": 10777,
+        "found": 6881,
+        "missed": 3896,
+        "recall": 0.6384893755219448,
+        "false_positives": 848,
+        "false_positives_per_image": 0.1696,
+        "detections_in_crowd_ignored": 558,
+        "precision": 0.8902833484279985
+      },
+      {
+        "conf": 0.4,
+        "people": 10777,
+        "found": 6257,
+        "missed": 4520,
+        "recall": 0.5805882898765891,
+        "false_positives": 470,
+        "false_positives_per_image": 0.094,
+        "detections_in_crowd_ignored": 345,
+        "precision": 0.9301323026609187
+      },
+      {
+        "conf": 0.5,
+        "people": 10777,
+        "found": 5580,
+        "missed": 5197,
+        "recall": 0.5177693235594322,
+        "false_positives": 282,
+        "false_positives_per_image": 0.0564,
+        "detections_in_crowd_ignored": 193,
+        "precision": 0.9518935516888434
+      },
+      {
+        "conf": 0.6,
+        "people": 10777,
+        "found": 4821,
+        "missed": 5956,
+        "recall": 0.4473415607311868,
+        "false_positives": 157,
+        "false_positives_per_image": 0.0314,
+        "detections_in_crowd_ignored": 97,
+        "precision": 0.9684612294094014
+      },
+      {
+        "conf": 0.7,
+        "people": 10777,
+        "found": 3927,
+        "missed": 6850,
+        "recall": 0.36438712072005197,
+        "false_positives": 66,
+        "false_positives_per_image": 0.0132,
+        "detections_in_crowd_ignored": 40,
+        "precision": 0.9834710743801653
+      }
+    ],
+    "mr2": 0.41608340382659004,
+    "mr2_extrapolated_points": 1
+  },
+  "safety_subset": {
+    "height_floor_px": 50.0,
+    "people": 7098,
+    "sweep": [
+      {
+        "conf": 0.05,
+        "people": 7098,
+        "found": 6572,
+        "missed": 526,
+        "recall": 0.9258946182023106,
+        "false_positives": 6442,
+        "false_positives_per_image": 1.2884,
+        "detections_in_crowd_ignored": 6063,
+        "precision": 0.5049946211771937
+      },
+      {
+        "conf": 0.1,
+        "people": 7098,
+        "found": 6385,
+        "missed": 713,
+        "recall": 0.899549168779938,
+        "false_positives": 3257,
+        "false_positives_per_image": 0.6514,
+        "detections_in_crowd_ignored": 3956,
+        "precision": 0.6622070109935698
+      },
+      {
+        "conf": 0.15,
+        "people": 7098,
+        "found": 6258,
+        "missed": 840,
+        "recall": 0.8816568047337278,
+        "false_positives": 2096,
+        "false_positives_per_image": 0.4192,
+        "detections_in_crowd_ignored": 3003,
+        "precision": 0.7491022264783337
+      },
+      {
+        "conf": 0.2,
+        "people": 7098,
+        "found": 6114,
+        "missed": 984,
+        "recall": 0.8613693998309383,
+        "false_positives": 1430,
+        "false_positives_per_image": 0.286,
+        "detections_in_crowd_ignored": 2467,
+        "precision": 0.8104453870625663
+      },
+      {
+        "conf": 0.25,
+        "people": 7098,
+        "found": 5958,
+        "missed": 1140,
+        "recall": 0.8393913778529163,
+        "false_positives": 1049,
+        "false_positives_per_image": 0.2098,
+        "detections_in_crowd_ignored": 2036,
+        "precision": 0.8502925645782788
+      },
+      {
+        "conf": 0.3,
+        "people": 7098,
+        "found": 5801,
+        "missed": 1297,
+        "recall": 0.817272471118625,
+        "false_positives": 802,
+        "false_positives_per_image": 0.1604,
+        "detections_in_crowd_ignored": 1684,
+        "precision": 0.8785400575495986
+      },
+      {
+        "conf": 0.4,
+        "people": 7098,
+        "found": 5469,
+        "missed": 1629,
+        "recall": 0.7704987320371935,
+        "false_positives": 447,
+        "false_positives_per_image": 0.0894,
+        "detections_in_crowd_ignored": 1156,
+        "precision": 0.9244421906693712
+      },
+      {
+        "conf": 0.5,
+        "people": 7098,
+        "found": 5055,
+        "missed": 2043,
+        "recall": 0.7121724429416737,
+        "false_positives": 270,
+        "false_positives_per_image": 0.054,
+        "detections_in_crowd_ignored": 730,
+        "precision": 0.9492957746478873
+      },
+      {
+        "conf": 0.6,
+        "people": 7098,
+        "found": 4500,
+        "missed": 2598,
+        "recall": 0.6339814032121724,
+        "false_positives": 152,
+        "false_positives_per_image": 0.0304,
+        "detections_in_crowd_ignored": 423,
+        "precision": 0.9673258813413586
+      },
+      {
+        "conf": 0.7,
+        "people": 7098,
+        "found": 3796,
+        "missed": 3302,
+        "recall": 0.5347985347985348,
+        "false_positives": 66,
+        "false_positives_per_image": 0.0132,
+        "detections_in_crowd_ignored": 171,
+        "precision": 0.9829104091144485
+      }
+    ],
+    "mr2": 0.22660716112299895,
+    "mr2_extrapolated_points": 1
+  },
+  "misses": {
+    "0.05": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1032,
+          "miss_rate": 0.6183343319352906
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 153,
+          "miss_rate": 0.06793960923623446
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 79,
+          "miss_rate": 0.031041257367387033
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 542,
+          "miss_rate": 0.26965174129353237
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 295,
+          "miss_rate": 0.1282051282051282
+        }
+      },
+      "missed_total": 2101,
+      "missed_untruncated": 1895,
+      "missed_truncated": 206,
+      "missed_uncrowded": 1558,
+      "missed_crowded": 543,
+      "missed_below_min_height": 1574,
+      "missed_below_min_height_fraction": 0.7491670633031889
+    },
+    "0.10": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1185,
+          "miss_rate": 0.7100059916117436
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 206,
+          "miss_rate": 0.09147424511545293
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 106,
+          "miss_rate": 0.04165029469548134
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 711,
+          "miss_rate": 0.3537313432835821
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 403,
+          "miss_rate": 0.1751412429378531
+        }
+      },
+      "missed_total": 2611,
+      "missed_untruncated": 2323,
+      "missed_truncated": 288,
+      "missed_uncrowded": 1894,
+      "missed_crowded": 717,
+      "missed_below_min_height": 1896,
+      "missed_below_min_height_fraction": 0.7261585599387208
+    },
+    "0.15": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1269,
+          "miss_rate": 0.7603355302576393
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 247,
+          "miss_rate": 0.10968028419182949
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 118,
+          "miss_rate": 0.04636542239685658
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 836,
+          "miss_rate": 0.41592039800995023
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 476,
+          "miss_rate": 0.20686657974793568
+        }
+      },
+      "missed_total": 2946,
+      "missed_untruncated": 2611,
+      "missed_truncated": 335,
+      "missed_uncrowded": 2129,
+      "missed_crowded": 817,
+      "missed_below_min_height": 2105,
+      "missed_below_min_height_fraction": 0.7145281737949762
+    },
+    "0.20": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1328,
+          "miss_rate": 0.7956860395446375
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 290,
+          "miss_rate": 0.12877442273534637
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 138,
+          "miss_rate": 0.05422396856581532
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 938,
+          "miss_rate": 0.4666666666666667
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 557,
+          "miss_rate": 0.24206866579747935
+        }
+      },
+      "missed_total": 3251,
+      "missed_untruncated": 2859,
+      "missed_truncated": 392,
+      "missed_uncrowded": 2339,
+      "missed_crowded": 912,
+      "missed_below_min_height": 2266,
+      "missed_below_min_height_fraction": 0.6970163026760997
+    },
+    "0.25": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1380,
+          "miss_rate": 0.8268424206111444
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 328,
+          "miss_rate": 0.14564831261101244
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 158,
+          "miss_rate": 0.062082514734774066
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1045,
+          "miss_rate": 0.5199004975124378
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 654,
+          "miss_rate": 0.2842242503259452
+        }
+      },
+      "missed_total": 3565,
+      "missed_untruncated": 3113,
+      "missed_truncated": 452,
+      "missed_uncrowded": 2543,
+      "missed_crowded": 1022,
+      "missed_below_min_height": 2425,
+      "missed_below_min_height_fraction": 0.6802244039270687
+    },
+    "0.30": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1441,
+          "miss_rate": 0.8633912522468544
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 370,
+          "miss_rate": 0.16429840142095914
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 188,
+          "miss_rate": 0.07387033398821218
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1158,
+          "miss_rate": 0.5761194029850746
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 739,
+          "miss_rate": 0.3211647109952195
+        }
+      },
+      "missed_total": 3896,
+      "missed_untruncated": 3364,
+      "missed_truncated": 532,
+      "missed_uncrowded": 2748,
+      "missed_crowded": 1148,
+      "missed_below_min_height": 2599,
+      "missed_below_min_height_fraction": 0.6670944558521561
+    },
+    "0.40": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1532,
+          "miss_rate": 0.9179149191132414
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 489,
+          "miss_rate": 0.21714031971580816
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 230,
+          "miss_rate": 0.09037328094302555
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1359,
+          "miss_rate": 0.6761194029850747
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 910,
+          "miss_rate": 0.3954802259887006
+        }
+      },
+      "missed_total": 4520,
+      "missed_untruncated": 3885,
+      "missed_truncated": 635,
+      "missed_uncrowded": 3138,
+      "missed_crowded": 1382,
+      "missed_below_min_height": 2891,
+      "missed_below_min_height_fraction": 0.6396017699115044
+    },
+    "0.50": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1590,
+          "miss_rate": 0.9526662672258838
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 603,
+          "miss_rate": 0.2677619893428064
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 302,
+          "miss_rate": 0.11866404715127701
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1564,
+          "miss_rate": 0.7781094527363184
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 1138,
+          "miss_rate": 0.494567579313342
+        }
+      },
+      "missed_total": 5197,
+      "missed_untruncated": 4432,
+      "missed_truncated": 765,
+      "missed_uncrowded": 3570,
+      "missed_crowded": 1627,
+      "missed_below_min_height": 3154,
+      "missed_below_min_height_fraction": 0.6068885895709063
+    },
+    "0.60": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1631,
+          "miss_rate": 0.9772318753744758
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 782,
+          "miss_rate": 0.347246891651865
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 407,
+          "miss_rate": 0.1599214145383104
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1727,
+          "miss_rate": 0.8592039800995025
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 1409,
+          "miss_rate": 0.612342459800087
+        }
+      },
+      "missed_total": 5956,
+      "missed_untruncated": 5049,
+      "missed_truncated": 907,
+      "missed_uncrowded": 4024,
+      "missed_crowded": 1932,
+      "missed_below_min_height": 3358,
+      "missed_below_min_height_fraction": 0.5638012088650101
+    },
+    "0.70": {
+      "by_height": {
+        "0-25px": {
+          "people": 1669,
+          "missed": 1657,
+          "miss_rate": 0.9928100659077291
+        },
+        "100-200px": {
+          "people": 2252,
+          "missed": 1023,
+          "miss_rate": 0.45426287744227356
+        },
+        "200-infpx": {
+          "people": 2545,
+          "missed": 567,
+          "miss_rate": 0.22278978388998036
+        },
+        "25-50px": {
+          "people": 2010,
+          "missed": 1891,
+          "miss_rate": 0.9407960199004975
+        },
+        "50-100px": {
+          "people": 2301,
+          "missed": 1712,
+          "miss_rate": 0.7440243372446762
+        }
+      },
+      "missed_total": 6850,
+      "missed_untruncated": 5778,
+      "missed_truncated": 1072,
+      "missed_uncrowded": 4574,
+      "missed_crowded": 2276,
+      "missed_below_min_height": 3548,
+      "missed_below_min_height_fraction": 0.517956204379562
+    }
+  },
+  "dataset": {
+    "split": "val2017",
+    "root": "C:\\Users\\user\\datasets\\coco",
+    "images": 5000,
+    "people": 10777,
+    "crowd_regions": 227,
+    "images_with_people": 2693,
+    "median_person_height_px": 83.11999999999998
+  }
+}

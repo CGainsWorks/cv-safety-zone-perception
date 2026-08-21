@@ -1,0 +1,29 @@
+# Export image.  Kept separate on purpose: it installs ultralytics, which is
+# AGPL-3.0 and the runtime image must not.  See docs/licences.md.
+#
+#   docker build -f docker/Dockerfile.export -t szp-export:latest .
+#   docker run --rm -v "$PWD/models:/app/models" szp-export:latest
+#
+# It runs once, produces models/yolov8n.onnx and models/model_card.json and is
+# never deployed.
+
+FROM python:3.12-slim-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt requirements-export.txt ./
+RUN python -m pip install --no-cache-dir --upgrade pip \
+    && python -m pip install --no-cache-dir -r requirements-export.txt
+
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+
+ENV PYTHONPATH=/app/src \
+    PYTHONUNBUFFERED=1 \
+    YOLO_CONFIG_DIR=/tmp/ultralytics
+
+CMD ["python", "scripts/fetch_model.py", "--models-dir", "/app/models"]

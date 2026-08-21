@@ -1,0 +1,24 @@
+# Runtime.  Pinned to what every number in the README was produced with.
+# Python 3.10 or newer (3.12 used for the published results).
+#
+# Deliberately absent from the runtime: torch and ultralytics.  The detector
+# runs on ONNX Runtime or TensorRT and never imports either.  Ultralytics is
+# AGPL-3.0 and is needed only to export the ONNX file; keeping it out of the
+# runtime keeps the deployed image MIT-compatible.  See docs/licences.md.
+
+numpy>=1.26,<3
+scipy>=1.11,<2
+opencv-python-headless>=4.9,<6   # headless: nothing here opens a window
+pyyaml>=6.0
+python-can>=4.3,<5
+matplotlib>=3.8,<4
+tqdm>=4.66
+
+# Detector runtime.  onnxruntime is the CPU/portable backend and is what CI
+# uses.  onnxruntime-gpu and tensorrt are installed separately on the Jetson or
+# on a CUDA host; see docker/Dockerfile.gpu and docs/tensorrt.md.
+onnxruntime>=1.17,<2
+
+# Development
+pytest>=8.0
+flake8>=7.0

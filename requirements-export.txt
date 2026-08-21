@@ -1,0 +1,12 @@
+# Export-time only.  Never installed into the runtime image.
+#
+# ULTRALYTICS IS AGPL-3.0.  It is used exactly once, by
+# scripts/export_onnx.py, to turn the published YOLOv8n checkpoint into an
+# ONNX graph.  Nothing under src/ imports it, so the shipped pipeline does not
+# link against AGPL code.  If you plan to use this commercially, read
+# docs/licences.md before running the export.
+
+-r requirements.txt
+ultralytics>=8.3,<9
+onnx>=1.16
+onnxslim>=0.1

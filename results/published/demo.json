@@ -1,0 +1,210 @@
+{
+  "frames": 360,
+  "stages_ms": {
+    "detect_pre_post": {
+      "n": 360,
+      "mean": 0.05820999999999999,
+      "p50": 0.05265,
+      "p95": 0.12372500000000003,
+      "p99": 0.159223,
+      "max": 0.3175
+    },
+    "fusion": {
+      "n": 360,
+      "mean": 1.6757822222222223,
+      "p50": 1.64395,
+      "p95": 3.1993400000000003,
+      "p99": 3.8084980000000033,
+      "max": 4.1597
+    },
+    "zones": {
+      "n": 360,
+      "mean": 2.1049897222222222,
+      "p50": 1.5661,
+      "p95": 6.957540000000001,
+      "p99": 7.874722,
+      "max": 8.417
+    },
+    "safety": {
+      "n": 360,
+      "mean": 0.08758416666666666,
+      "p50": 0.08365,
+      "p95": 0.16704500000000005,
+      "p99": 0.218441,
+      "max": 0.2491
+    },
+    "publish": {
+      "n": 360,
+      "mean": 0.10136305555555557,
+      "p50": 0.0931,
+      "p95": 0.1736350000000001,
+      "p99": 0.23310800000000023,
+      "max": 0.2534
+    },
+    "publish_aux": {
+      "n": 360,
+      "mean": 0.12643805555555554,
+      "p50": 0.0023,
+      "p95": 0.56687,
+      "p99": 0.7235980000000002,
+      "max": 10.4091
+    }
+  },
+  "end_to_end_ms": {
+    "n": 360,
+    "mean": 4.088889166666667,
+    "p50": 3.74255,
+    "p95": 10.384465,
+    "p99": 11.634450000000005,
+    "max": 12.5405
+  },
+  "period_ms": {
+    "n": 359,
+    "mean": 94.68870501392756,
+    "p50": 97.4228,
+    "p95": 130.67274,
+    "p99": 133.295398,
+    "max": 134.2703
+  },
+  "unaccounted_ms": {
+    "n": 360,
+    "mean": 0.06095999999999996,
+    "p50": 0.06070000000000009,
+    "p95": 0.08638499999999964,
+    "p99": 0.10016099999999974,
+    "max": 0.10749999999999993
+  },
+  "stage_sum_p50_ms": 3.43945,
+  "counters": {},
+  "detector": {
+    "backend": "simulated",
+    "note": "ground truth with injected faults; not a detector",
+    "jitter_px": 2.5,
+    "miss_probability": 0.05,
+    "false_positive_rate": 0.005,
+    "min_visibility": 0.25
+  },
+  "zones": [
+    "machine_envelope",
+    "feed_chute",
+    "approach_corridor"
+  ],
+  "internal_errors": 0,
+  "can": {
+    "interface": "virtual",
+    "channel": "szp",
+    "frames_sent": 540,
+    "echo_misses": 0,
+    "receive_own_messages": true
+  },
+  "scene": {
+    "duration_s": 24.0,
+    "fps": 15.0,
+    "frames": 360,
+    "people": 3,
+    "image": [
+      640,
+      480
+    ],
+    "camera_xyz": [
+      -1.0,
+      0.0,
+      2.6
+    ],
+    "camera_tilt_down_deg": 18.0,
+    "lidar_xyz": [
+      -0.6,
+      0.0,
+      0.45
+    ],
+    "lidar_beams": 961,
+    "depth_max_range_m": 8.0,
+    "depth_dropout": 0.02,
+    "lidar_dropout": 0.01,
+    "seed": 20260821
+  },
+  "detector_kind": "simulated",
+  "states": {
+    "INIT": 4,
+    "CLEAR": 89,
+    "STOP": 209,
+    "RECOVERING": 12,
+    "WARN": 46
+  },
+  "wall_clock_s": 34.12,
+  "frames_run": 360,
+  "can_interface": "virtual",
+  "period_watchdog_enforced": false,
+  "plc_end_to_end_ms": {
+    "n": 3,
+    "mean": 5.576433333333333,
+    "p50": 6.1467,
+    "p95": 6.79011,
+    "p99": 6.847302,
+    "max": 6.8616
+  },
+  "plc": {
+    "frames_seen": 360,
+    "crc_failures": 0,
+    "frozen_counter_events": 0,
+    "timeouts": 1,
+    "heartbeats_sent": 311,
+    "permit_changes": 9
+  },
+  "plc_permit_changes": [
+    {
+      "t_ms_since_first_change": 0.0,
+      "permitted": true,
+      "reason": "permitted",
+      "state": "CLEAR"
+    },
+    {
+      "t_ms_since_first_change": 2185.174,
+      "permitted": false,
+      "reason": "state 3",
+      "state": "STOP"
+    },
+    {
+      "t_ms_since_first_change": 10518.9,
+      "permitted": true,
+      "reason": "permitted",
+      "state": "WARN"
+    },
+    {
+      "t_ms_since_first_change": 10788.727,
+      "permitted": false,
+      "reason": "state 3",
+      "state": "STOP"
+    },
+    {
+      "t_ms_since_first_change": 13128.007,
+      "permitted": true,
+      "reason": "permitted",
+      "state": "WARN"
+    },
+    {
+      "t_ms_since_first_change": 17067.194,
+      "permitted": false,
+      "reason": "permit lapsed: stale by 103.4 ms",
+      "state": null
+    },
+    {
+      "t_ms_since_first_change": 17068.089,
+      "permitted": true,
+      "reason": "permitted",
+      "state": "CLEAR"
+    },
+    {
+      "t_ms_since_first_change": 20934.628,
+      "permitted": false,
+      "reason": "state 3",
+      "state": "STOP"
+    },
+    {
+      "t_ms_since_first_change": 33410.219,
+      "permitted": true,
+      "reason": "permitted",
+      "state": "CLEAR"
+    }
+  ]
+}

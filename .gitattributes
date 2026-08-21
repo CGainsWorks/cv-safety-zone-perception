@@ -1,0 +1,20 @@
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.mp4 binary
+*.onnx binary
+*.engine binary
+*.pt binary
+*.bag binary
+
+# Git LFS.  Nothing large is committed today; these rules exist so that if a
+# demo GIF, a sample bag or a set of weights is ever added it lands in LFS
+# rather than in the pack file.  Install with: git lfs install
+*.onnx filter=lfs diff=lfs merge=lfs -text
+*.engine filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.bag filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text

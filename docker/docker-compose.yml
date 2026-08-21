@@ -1,0 +1,68 @@
+# One command to see the whole thing run:
+#
+#     docker compose -f docker/docker-compose.yml up --build
+#
+# Two containers on one CAN bus.  The pipeline publishes the e-stop permit and
+# the "plc" container watches it with candump, so the frames are visible rather
+# than asserted.
+#
+# NET_ADMIN and the vcan module are what let the containers use a real
+# SocketCAN interface instead of python-can's in-process bus.  On a host
+# without the vcan module -- Docker Desktop on macOS or Windows -- the modprobe
+# fails, the pipeline falls back to the in-process bus and the result file
+# records which one it used.  Correctness is unaffected; timings are not
+# comparable.
+
+name: szp
+
+services:
+  pipeline:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: szp:latest
+    cap_add: ["NET_ADMIN"]
+    network_mode: "service:canbus"
+    depends_on:
+      canbus:
+        condition: service_healthy
+    volumes:
+      - ../results:/app/results
+      - ../models:/app/models:ro
+    environment:
+      SZP_CAN_INTERFACE: socketcan
+      SZP_CAN_CHANNEL: vcan0
+    command: >
+      python scripts/run_demo.py
+      --can socketcan --channel vcan0
+      --out /app/results/demo.json
+      --timeline /app/results/demo_timeline.csv
+
+  # Owns the network namespace and the vcan interface.  Everything else joins
+  # it, which is how two containers end up on the same bus.
+  canbus:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: szp:latest
+    cap_add: ["NET_ADMIN"]
+    command: >
+      sh -c "modprobe vcan 2>/dev/null || true;
+             ip link add dev vcan0 type vcan 2>/dev/null || true;
+             ip link set up vcan0 2>/dev/null || true;
+             ip -brief link show;
+             sleep infinity"
+    healthcheck:
+      test: ["CMD-SHELL", "ip link show vcan0 || exit 1"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+
+  # Dumps the frames, so the e-stop permit is visible rather than asserted.
+  candump:
+    image: szp:latest
+    depends_on:
+      canbus:
+        condition: service_healthy
+    network_mode: "service:canbus"
+    command: ["candump", "-tz", "vcan0"]

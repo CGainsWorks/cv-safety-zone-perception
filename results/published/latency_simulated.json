@@ -1,0 +1,197 @@
+{
+  "frames": 1104,
+  "stages_ms": {
+    "detect_pre_post": {
+      "n": 1104,
+      "mean": 0.01657998188405797,
+      "p50": 0.00545,
+      "p95": 0.044569999999999985,
+      "p99": 0.091991,
+      "max": 0.1238
+    },
+    "fusion": {
+      "n": 1104,
+      "mean": 0.9214347826086957,
+      "p50": 0.7134499999999999,
+      "p95": 1.8791699999999998,
+      "p99": 2.1514680000000004,
+      "max": 2.547
+    },
+    "zones": {
+      "n": 1104,
+      "mean": 1.0212226449275361,
+      "p50": 0.0144,
+      "p95": 3.8374499999999996,
+      "p99": 4.242290000000001,
+      "max": 5.6455
+    },
+    "safety": {
+      "n": 1104,
+      "mean": 0.03283550724637681,
+      "p50": 0.0287,
+      "p95": 0.057354999999999975,
+      "p99": 0.08187900000000002,
+      "max": 0.1673
+    },
+    "publish": {
+      "n": 1104,
+      "mean": 0.0734413043478261,
+      "p50": 0.0694,
+      "p95": 0.1006,
+      "p99": 0.15362800000000007,
+      "max": 0.2159
+    },
+    "publish_aux": {
+      "n": 1104,
+      "mean": 0.10580978260869564,
+      "p50": 0.0015,
+      "p95": 0.5641,
+      "p99": 0.7426630000000002,
+      "max": 8.7035
+    }
+  },
+  "end_to_end_ms": {
+    "n": 1104,
+    "mean": 2.0908378623188404,
+    "p50": 0.8698,
+    "p95": 5.859149999999999,
+    "p99": 6.500405,
+    "max": 8.444
+  },
+  "period_ms": {
+    "n": 1103,
+    "mean": 4.328287669990934,
+    "p50": 3.1415,
+    "p95": 8.16011,
+    "p99": 8.930503999999999,
+    "max": 14.142
+  },
+  "unaccounted_ms": {
+    "n": 1104,
+    "mean": 0.025323641304347822,
+    "p50": 0.02310000000000001,
+    "p95": 0.04503499999999986,
+    "p99": 0.05569700000000008,
+    "max": 0.07820000000000005
+  },
+  "stage_sum_p50_ms": 0.8313999999999999,
+  "counters": {},
+  "detector": {
+    "backend": "simulated",
+    "note": "ground truth with injected faults; not a detector",
+    "jitter_px": 2.5,
+    "miss_probability": 0.0,
+    "false_positive_rate": 0.0,
+    "min_visibility": 0.25
+  },
+  "zones": [
+    "machine_envelope",
+    "feed_chute",
+    "approach_corridor"
+  ],
+  "internal_errors": 0,
+  "can": {
+    "interface": "virtual",
+    "channel": "szp",
+    "frames_sent": 1656,
+    "echo_misses": 0,
+    "receive_own_messages": true
+  },
+  "detector_kind": "simulated",
+  "can_interface": "virtual",
+  "states": {
+    "INIT": 4,
+    "CLEAR": 482,
+    "STOP": 478,
+    "RECOVERING": 28,
+    "WARN": 112
+  },
+  "entry_events": 29,
+  "entry_events_unmeasurable": 0,
+  "reaction_ms": {
+    "n": 29,
+    "mean": 4.911813793103448,
+    "p50": 4.6381,
+    "p95": 6.223459999999999,
+    "p99": 6.664891999999999,
+    "max": 6.7912
+  },
+  "plc": {
+    "frames_seen": 1104,
+    "crc_failures": 0,
+    "frozen_counter_events": 0,
+    "timeouts": 0,
+    "heartbeats_sent": 49,
+    "permit_changes": 58
+  },
+  "budget": [
+    {
+      "stage": "detect_pre_post",
+      "mean_ms": 0.01657998188405797,
+      "p50_ms": 0.00545,
+      "p99_ms": 0.091991,
+      "share_of_mean": 0.00792982668951191
+    },
+    {
+      "stage": "fusion",
+      "mean_ms": 0.9214347826086957,
+      "p50_ms": 0.7134499999999999,
+      "p99_ms": 2.1514680000000004,
+      "share_of_mean": 0.4407012132384
+    },
+    {
+      "stage": "zones",
+      "mean_ms": 1.0212226449275361,
+      "p50_ms": 0.0144,
+      "p99_ms": 4.242290000000001,
+      "share_of_mean": 0.4884274688784097
+    },
+    {
+      "stage": "safety",
+      "mean_ms": 0.03283550724637681,
+      "p50_ms": 0.0287,
+      "p99_ms": 0.08187900000000002,
+      "share_of_mean": 0.015704473234457617
+    },
+    {
+      "stage": "publish",
+      "mean_ms": 0.0734413043478261,
+      "p50_ms": 0.0694,
+      "p99_ms": 0.15362800000000007,
+      "share_of_mean": 0.03512529865246277
+    },
+    {
+      "stage": "unaccounted",
+      "mean_ms": 0.02532364130434761,
+      "p50_ms": 0.02310000000000001,
+      "p99_ms": 0.05569700000000008,
+      "share_of_mean": 0.012111719306757945
+    }
+  ],
+  "scene": {
+    "duration_s": 73.60000000000001,
+    "fps": 15.0,
+    "frames": 1104,
+    "people": 30,
+    "image": [
+      640,
+      480
+    ],
+    "camera_xyz": [
+      -1.0,
+      0.0,
+      2.6
+    ],
+    "camera_tilt_down_deg": 18.0,
+    "lidar_xyz": [
+      -0.6,
+      0.0,
+      0.45
+    ],
+    "lidar_beams": 961,
+    "depth_max_range_m": 8.0,
+    "depth_dropout": 0.02,
+    "lidar_dropout": 0.01,
+    "seed": 20260821
+  }
+}

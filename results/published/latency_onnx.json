@@ -1,0 +1,220 @@
+{
+  "frames": 1104,
+  "stages_ms": {
+    "detect_pre_post": {
+      "n": 1104,
+      "mean": 3.051588858695652,
+      "p50": 3.0228,
+      "p95": 3.3434849999999994,
+      "p99": 3.5847610000000003,
+      "max": 3.9578
+    },
+    "inference": {
+      "n": 1104,
+      "mean": 26.38547219202899,
+      "p50": 26.317950000000003,
+      "p95": 28.272199999999994,
+      "p99": 29.025616,
+      "max": 31.6787
+    },
+    "fusion": {
+      "n": 1104,
+      "mean": 1.1181557065217391,
+      "p50": 0.91815,
+      "p95": 1.898895,
+      "p99": 2.080957,
+      "max": 2.5866
+    },
+    "zones": {
+      "n": 1104,
+      "mean": 1.0111797101449276,
+      "p50": 0.0241,
+      "p95": 3.18011,
+      "p99": 3.4665400000000006,
+      "max": 4.5351
+    },
+    "safety": {
+      "n": 1104,
+      "mean": 0.05949565217391304,
+      "p50": 0.0586,
+      "p95": 0.08846999999999998,
+      "p99": 0.102897,
+      "max": 0.171
+    },
+    "publish": {
+      "n": 1104,
+      "mean": 0.09821114130434781,
+      "p50": 0.10064999999999999,
+      "p95": 0.11498499999999999,
+      "p99": 0.14284600000000006,
+      "max": 0.2123
+    },
+    "publish_aux": {
+      "n": 1104,
+      "mean": 0.11002735507246378,
+      "p50": 0.0021,
+      "p95": 0.5830899999999999,
+      "p99": 0.675688,
+      "max": 9.5577
+    }
+  },
+  "end_to_end_ms": {
+    "n": 1104,
+    "mean": 31.801279891304354,
+    "p50": 31.1098,
+    "p95": 35.868265,
+    "p99": 36.841538,
+    "max": 38.4243
+  },
+  "period_ms": {
+    "n": 1103,
+    "mean": 34.066002085222124,
+    "p50": 33.3599,
+    "p95": 38.136759999999995,
+    "p99": 39.117674,
+    "max": 44.6683
+  },
+  "unaccounted_ms": {
+    "n": 1104,
+    "mean": 0.07717663043478254,
+    "p50": 0.07629999999999981,
+    "p95": 0.09258499999999986,
+    "p99": 0.113900000000001,
+    "max": 0.14480000000000004
+  },
+  "stage_sum_p50_ms": 30.442250000000005,
+  "counters": {},
+  "detector": {
+    "backend": "onnx_timing",
+    "model": "yolov8n.onnx",
+    "model_sha256_prefix": "a496d1e248b472ee",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "input_size": [
+      640,
+      640
+    ],
+    "conf_threshold": 0.15,
+    "iou_threshold": 0.55,
+    "onnxruntime": "1.29.0",
+    "note": "the real model runs on every frame so the timing is real; the detections come from the synthetic rig's ground truth, so no accuracy claim can be made from this run"
+  },
+  "zones": [
+    "machine_envelope",
+    "feed_chute",
+    "approach_corridor"
+  ],
+  "internal_errors": 0,
+  "can": {
+    "interface": "virtual",
+    "channel": "szp",
+    "frames_sent": 1656,
+    "echo_misses": 0,
+    "receive_own_messages": true
+  },
+  "detector_kind": "onnx_timing",
+  "can_interface": "virtual",
+  "states": {
+    "INIT": 4,
+    "CLEAR": 482,
+    "STOP": 478,
+    "RECOVERING": 28,
+    "WARN": 112
+  },
+  "entry_events": 29,
+  "entry_events_unmeasurable": 0,
+  "reaction_ms": {
+    "n": 29,
+    "mean": 34.23461034482759,
+    "p50": 34.4584,
+    "p95": 36.4211,
+    "p99": 36.75338,
+    "max": 36.8021
+  },
+  "plc": {
+    "frames_seen": 1104,
+    "crc_failures": 0,
+    "frozen_counter_events": 0,
+    "timeouts": 0,
+    "heartbeats_sent": 345,
+    "permit_changes": 58
+  },
+  "budget": [
+    {
+      "stage": "detect_pre_post",
+      "mean_ms": 3.051588858695652,
+      "p50_ms": 3.0228,
+      "p99_ms": 3.5847610000000003,
+      "share_of_mean": 0.09595805166099838
+    },
+    {
+      "stage": "inference",
+      "mean_ms": 26.38547219202899,
+      "p50_ms": 26.317950000000003,
+      "p99_ms": 29.025616,
+      "share_of_mean": 0.8296984361074018
+    },
+    {
+      "stage": "fusion",
+      "mean_ms": 1.1181557065217391,
+      "p50_ms": 0.91815,
+      "p99_ms": 2.080957,
+      "share_of_mean": 0.03516071398206474
+    },
+    {
+      "stage": "zones",
+      "mean_ms": 1.0111797101449276,
+      "p50_ms": 0.0241,
+      "p99_ms": 3.4665400000000006,
+      "share_of_mean": 0.031796824329118324
+    },
+    {
+      "stage": "safety",
+      "mean_ms": 0.05949565217391304,
+      "p50_ms": 0.0586,
+      "p99_ms": 0.102897,
+      "share_of_mean": 0.0018708571597516536
+    },
+    {
+      "stage": "publish",
+      "mean_ms": 0.09821114130434781,
+      "p50_ms": 0.10064999999999999,
+      "p99_ms": 0.14284600000000006,
+      "share_of_mean": 0.003088276372524314
+    },
+    {
+      "stage": "unaccounted",
+      "mean_ms": 0.07717663043478495,
+      "p50_ms": 0.07629999999999981,
+      "p99_ms": 0.113900000000001,
+      "share_of_mean": 0.002426840388140727
+    }
+  ],
+  "scene": {
+    "duration_s": 73.60000000000001,
+    "fps": 15.0,
+    "frames": 1104,
+    "people": 30,
+    "image": [
+      640,
+      480
+    ],
+    "camera_xyz": [
+      -1.0,
+      0.0,
+      2.6
+    ],
+    "camera_tilt_down_deg": 18.0,
+    "lidar_xyz": [
+      -0.6,
+      0.0,
+      0.45
+    ],
+    "lidar_beams": 961,
+    "depth_max_range_m": 8.0,
+    "depth_dropout": 0.02,
+    "lidar_dropout": 0.01,
+    "seed": 20260821
+  }
+}

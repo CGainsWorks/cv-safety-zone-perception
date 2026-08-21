@@ -1,0 +1,33 @@
+# The build context is the repository root, so without this a local .venv and a
+# downloaded model would be shipped to the daemon on every build: hundreds of
+# megabytes, none of it wanted in the image.
+
+.venv/
+venv/
+.git/
+.github/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Weights and engines are mounted at run time, never baked in.  See
+# docs/licences.md for why the AGPL-derived ONNX file stays out of the image.
+models/
+*.onnx
+*.engine
+*.pt
+
+# Datasets live outside the repository.
+datasets/
+data/coco/
+
+# Run outputs.  results/published/ is small and is kept, because
+# scripts/check_docs.py reads it.
+results/*
+!results/published/
+!results/published/**
+
+*.md.orig
+.DS_Store
+Thumbs.db
