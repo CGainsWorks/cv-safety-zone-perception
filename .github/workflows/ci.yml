@@ -90,7 +90,7 @@ jobs:
           }
           # -o addopts= clears the -q in pytest.ini, which would otherwise
           # cancel the -v and leave nothing per-test to count.
-          python -m pytest tests/test_can_link.py -k socketcan -v -o addopts= \n            | tee /tmp/can.txt
+          python -m pytest tests/test_can_link.py -k socketcan -v -o addopts= | tee /tmp/can.txt
           passed=$(grep -cF 'socketcan] PASSED' /tmp/can.txt || true)
           echo "socketcan-parametrised tests passed: $passed"
           if [ "$passed" -lt 5 ]; then
