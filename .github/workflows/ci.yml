@@ -78,12 +78,25 @@ jobs:
 
       - name: The CAN tests really did run over socketcan
         run: |
-          python -m pytest tests/test_can_link.py -q -k socketcan --durations=0 \
-            | tee /tmp/can.txt
-          grep -qE '[1-9][0-9]* passed' /tmp/can.txt || {
-            echo "no socketcan-parametrised tests ran; vcan0 was not detected" >&2
+          # tests/test_can_link.py only adds the socketcan parametrisation when
+          # vcan0 exists, so without this the whole CAN suite could quietly run
+          # on python-can's in-process bus and still go green.  Counting the
+          # PASSED lines per test is deliberate: parsing pytest's summary line
+          # is what the first version did, and the summary is not always there.
+          test -e /sys/class/net/vcan0 || {
+            echo "vcan0 does not exist; the CAN tests would fall back to the "\
+                 "in-process bus" >&2
             exit 1
           }
+          # -o addopts= clears the -q in pytest.ini, which would otherwise
+          # cancel the -v and leave nothing per-test to count.
+          python -m pytest tests/test_can_link.py -k socketcan -v -o addopts= \n            | tee /tmp/can.txt
+          passed=$(grep -cF 'socketcan] PASSED' /tmp/can.txt || true)
+          echo "socketcan-parametrised tests passed: $passed"
+          if [ "$passed" -lt 5 ]; then
+            echo "expected at least 5 socketcan tests, got $passed" >&2
+            exit 1
+          fi
         env:
           PYTHONPATH: src
 
