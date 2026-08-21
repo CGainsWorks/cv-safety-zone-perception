@@ -52,6 +52,17 @@ jobs:
 
       - name: Bring up vcan0
         run: |
+          # The runner's kernel does not carry vcan in its default module set,
+          # so the extra-modules package for the running kernel has to go on
+          # first.  If this ever stops working the job fails here rather than
+          # falling back to python-can's in-process bus: "the safety tests run
+          # over the real SocketCAN stack" is a claim this repository makes in
+          # its README, and a silent fallback would leave the claim false with
+          # the tick still green.
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq "linux-modules-extra-$(uname -r)" \
+            || sudo apt-get install -y -qq linux-modules-extra-azure \
+            || echo "no extra-modules package; trying modprobe anyway"
           sudo modprobe vcan
           sudo ip link add dev vcan0 type vcan
           sudo ip link set up vcan0
