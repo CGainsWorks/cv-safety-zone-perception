@@ -31,7 +31,7 @@ sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from szp.data.synthetic import SceneConfig, SyntheticScene  # noqa: E402
 from szp.detection.base import DetectorConfig, build_detector  # noqa: E402
-from szp.detection.postprocess import decode_yolov8  # noqa: E402
+from szp.detection.postprocess import decode_head  # noqa: E402
 from szp.detection.preprocess import letterbox  # noqa: E402
 from szp.fusion.fuse import Fuser  # noqa: E402
 from szp.fusion.lidar import LidarConfig, ScanCluster, scan_to_points, segment_scan  # noqa: E402
@@ -187,8 +187,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                 raw = detector.session.run(None, {detector.input_name: tensor})[0]
                 results.append(
                     timeit(
-                        "postprocess.decode_yolov8",
-                        lambda: decode_yolov8(raw, transform, conf_threshold=0.15),
+                        "postprocess.decode_head",
+                        lambda: decode_head(raw, transform, conf_threshold=0.15),
                         args.repeats,
                     )
                 )

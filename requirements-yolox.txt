@@ -1,0 +1,7 @@
+# YOLOX, Apache-2.0, Megvii.  Install after requirements-export.txt with
+#
+#     pip install --no-deps --no-build-isolation -r requirements-yolox.txt
+#
+# See the note at the top of requirements-export.txt for why.
+
+yolox==0.3.0

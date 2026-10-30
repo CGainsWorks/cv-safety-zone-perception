@@ -1,11 +1,10 @@
 # Runtime.  Pinned to what every number in the README was produced with.
 # Python 3.10 or newer (3.12 used for the published results).
 #
-# Deliberately absent from the runtime: torch and ultralytics.  The detector
-# runs on ONNX Runtime or TensorRT and never imports either.  Ultralytics is
-# AGPL-3.0 and is needed only to export the ONNX file; keeping it out of the
-# runtime keeps its code out of the deployed image.  The weights it exports are
-# still Ultralytics' AGPL-3.0 model.  See docs/licences.md.
+# Deliberately absent from the runtime: torch and yolox.  The detector runs on
+# ONNX Runtime or TensorRT and never imports either; they are needed only to
+# export the ONNX file.  The detector is Megvii's YOLOX-Tiny, Apache-2.0 code
+# and weights.  See docs/licences.md.
 
 numpy>=1.26,<3
 scipy>=1.11,<2

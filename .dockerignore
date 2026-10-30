@@ -11,12 +11,13 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
-# Weights and engines are mounted at run time, never baked in.  See
-# docs/licences.md for why the AGPL-derived ONNX file stays out of the image.
+# Weights and engines are mounted at run time, never baked in, so the image
+# does not change every time the detector is re-exported.
 models/
 *.onnx
 *.engine
 *.pt
+*.pth
 
 # Datasets live outside the repository.
 datasets/

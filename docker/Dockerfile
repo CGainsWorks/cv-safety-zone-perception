@@ -1,17 +1,18 @@
-# Runtime image.  CPU, ONNX Runtime, no torch and no ultralytics.
+# Runtime image.  CPU, ONNX Runtime, no torch and no yolox.
 #
-# The AGPL-3.0 export toolchain deliberately does not appear here; see
-# docs/licences.md and docker/Dockerfile.export.  The result is an image whose
-# code dependencies are permissively licensed (python-can is LGPL-3.0); the
-# AGPL-3.0 weights are mounted at run time and keep their licence.
+# The export toolchain deliberately does not appear here; see
+# docker/Dockerfile.export.  torch is two gigabytes the runtime has no use for
+# once the model is an ONNX file.  The code dependencies are permissively
+# licensed (python-can is LGPL-3.0) and so are the YOLOX weights, which are
+# Apache-2.0; docs/licences.md has the table.
 #
 #   docker build -f docker/Dockerfile -t szp:latest .
 #   docker run --rm szp:latest                         # the demo
 #   docker run --rm szp:latest python -m pytest tests/ -q
 #
-# The model weights are not baked in.  They are AGPL-derived and machine
-# independent, so they are mounted or fetched at run time; without them
-# everything except the real detector still works.
+# The model weights are not baked in.  They are forty megabytes that change
+# independently of the code, so they are mounted or fetched at run time;
+# without them everything except the real detector still works.
 
 FROM python:3.12-slim-bookworm
 
@@ -43,7 +44,7 @@ COPY pytest.ini .flake8 Makefile LICENSE README.md ./
 
 ENV PYTHONPATH=/app/src \
     PYTHONUNBUFFERED=1 \
-    SZP_MODEL=/app/models/yolov8n.onnx \
+    SZP_MODEL=/app/models/yolox_tiny.onnx \
     SZP_DATA_ROOT=/data
 
 # vcan needs a kernel module and NET_ADMIN, which a default container does not

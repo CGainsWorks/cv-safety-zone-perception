@@ -7,7 +7,8 @@ wheel on a runner with no GPU.
 What a GPU-less runner can check and what it cannot.  The wheel imports and
 its classes and enums can be inspected, so every TensorRT symbol that
 ``szp.detection.tensorrt_backend`` and ``scripts/export_tensorrt.py`` touch is
-looked up here against the pinned version.  ``trt.Builder`` needs a CUDA
+looked up here against the pinned version and the INT8 calibrator is built on
+TensorRT's real base class.  ``trt.Builder`` needs a CUDA
 driver and aborts the process without one, so creating a network definition,
 parsing the ONNX graph and building an engine stay a manual step
 (``make tensorrt-desktop``, in ``docs/tensorrt.md``).
@@ -17,6 +18,8 @@ from __future__ import annotations
 
 import ast
 import re
+import sys
+import types
 from pathlib import Path
 
 import pytest
@@ -36,8 +39,8 @@ OBJECT_API = {
                     "get_tensor_shape", "get_tensor_dtype", "create_execution_context"),
     "IExecutionContext": ("get_tensor_shape", "set_tensor_address", "execute_async_v3"),
     "Builder": ("create_network", "create_builder_config", "build_serialized_network",
-                "platform_has_fast_fp16"),
-    "IBuilderConfig": ("set_memory_pool_limit", "set_flag"),
+                "platform_has_fast_fp16", "platform_has_fast_int8"),
+    "IBuilderConfig": ("set_memory_pool_limit", "set_flag", "int8_calibrator"),
     "OnnxParser": ("parse", "num_errors", "get_error"),
 }
 
@@ -95,3 +98,33 @@ def test_the_backend_module_imports():
     from szp.detection import tensorrt_backend
 
     assert tensorrt_backend.TensorRTDetector.name == "tensorrt"
+
+
+def test_the_calibrator_builds_on_the_real_base_class(monkeypatch, tmp_path):
+    """The INT8 calibrator subclasses TensorRT's own class, which only exists here.
+
+    pycuda is stubbed because it needs a GPU to import usefully; the point is
+    that the subclass is accepted by the real ``IInt8EntropyCalibrator2`` and
+    overrides the four methods TensorRT calls back into.
+    """
+    fake_driver = types.ModuleType("pycuda.driver")
+    fake_driver.mem_alloc = lambda nbytes: 0
+    fake_driver.memcpy_htod = lambda dst, src: None
+    fake_pycuda = types.ModuleType("pycuda")
+    fake_pycuda.driver = fake_driver
+    monkeypatch.setitem(sys.modules, "pycuda", fake_pycuda)
+    monkeypatch.setitem(sys.modules, "pycuda.driver", fake_driver)
+    monkeypatch.syspath_prepend(str(ROOT / "scripts"))
+    import export_tensorrt
+
+    klass = export_tensorrt._calibrator_class(
+        trt, [], (640, 640), tmp_path / "calib.cache", batch_size=8
+    )
+    assert issubclass(klass, trt.IInt8EntropyCalibrator2)
+    for method in ("get_batch_size", "get_batch", "read_calibration_cache",
+                   "write_calibration_cache"):
+        assert method in vars(klass), f"the calibrator does not override {method}"
+    calibrator = klass()
+    assert calibrator.get_batch_size() == 8
+    assert calibrator.get_batch(["images"]) is None  # no images, so no batch
+    assert calibrator.read_calibration_cache() is None

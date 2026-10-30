@@ -26,8 +26,10 @@ models/
 data/coco/
 datasets/
 
-# Ultralytics writes its own run directory wherever the export is run from.
+# Training frameworks write run directories wherever they are started from.
 runs/
+YOLOX_outputs/
+*.pth
 
 # Run outputs.  results/published/ is tracked and is the exception.
 results/*

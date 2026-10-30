@@ -14,7 +14,7 @@
 #               make model  make data  make experiments
 #
 #   GPU       needs an NVIDIA GPU.  Not run by CI, which has no GPU.
-#             `make tensorrt-desktop` builds the FP32 and FP16 engines in
+#             `make tensorrt-desktop` builds the FP32, FP16 and INT8 engines in
 #             NVIDIA's TensorRT container, scores them on COCO, times the
 #             pipeline and writes results/published/tensorrt.json; it ran on a
 #             desktop RTX 4060, never on a Jetson.  See docs/tensorrt.md.
@@ -116,8 +116,9 @@ install:  ## Create .venv and install the runtime requirements
 	$(VENV_PY) -m pip install -r requirements.txt
 
 .PHONY: model
-model:  ## Download YOLOv8n and export it to ONNX (installs ultralytics, AGPL-3.0)
+model:  ## Download YOLOX-Tiny and export it to ONNX (installs torch and yolox)
 	$(VENV_PY) -m pip install -r requirements-export.txt
+	$(VENV_PY) -m pip install --no-deps --no-build-isolation -r requirements-yolox.txt
 	$(VENV_PY) scripts/fetch_model.py
 
 .PHONY: data
@@ -133,6 +134,22 @@ experiments: detection geometry latency fmea  ## Regenerate every published numb
 detection:  ## Person-detection recall and miss rate on COCO val2017
 	@mkdir -p $(PUBLISHED)
 	$(VENV_PY) analysis/detection_metrics.py --out $(PUBLISHED)/detection_val2017.json
+
+.PHONY: int8
+int8:  ## FP16 and INT8 ONNX graphs, scored on COCO val2017 (export toolchain, a GPU for FP16)
+	@mkdir -p $(PUBLISHED)
+	$(VENV_PY) scripts/fetch_model.py --fp16
+	$(VENV_PY) scripts/fetch_calibration.py
+	$(VENV_PY) scripts/quantize_onnx.py
+	cp models/quantisation.json $(PUBLISHED)/quantisation.json
+	$(VENV_PY) analysis/detection_metrics.py --backend onnx --model models/yolox_tiny_fp16.onnx \
+	  --out $(PUBLISHED)/detection_val2017_fp16.json
+	$(VENV_PY) analysis/detection_metrics.py --backend onnx --model models/yolox_tiny_int8.onnx \
+	  --out $(PUBLISHED)/detection_val2017_int8.json
+
+.PHONY: compare
+compare:  ## Put the published numbers beside the YOLOv8n ones they replaced
+	$(VENV_PY) analysis/compare_detectors.py
 
 .PHONY: geometry
 geometry:  ## Fusion accuracy and zone confusion on the synthetic cell
@@ -167,7 +184,7 @@ tensorrt-desktop:  ## Build, score and time TensorRT engines on this GPU (Docker
 
 .PHONY: engine
 engine:  ## Build a TensorRT engine (needs an NVIDIA GPU; never committed)
-	$(VENV_PY) scripts/export_tensorrt.py --fp16
+	$(VENV_PY) scripts/export_tensorrt.py --precision fp16
 
 .PHONY: trt-check
 trt-check:  ## Check the TensorRT engine agrees with ONNX Runtime

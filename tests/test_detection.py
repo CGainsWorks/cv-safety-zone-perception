@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from szp.detection.base import DetectorConfig, build_detector
-from szp.detection.postprocess import decode_yolov8, iou_matrix, nms, xywh_to_xyxy
+from szp.detection.postprocess import decode_head, iou_matrix, nms, xywh_to_xyxy
 from szp.detection.preprocess import letterbox
 
 
@@ -128,7 +128,7 @@ def test_decode_filters_by_confidence_and_suppresses_duplicates():
             ((500.0, 300.0, 60.0, 120.0), 0.05),   # below threshold
         ]
     )
-    detections = decode_yolov8(head, transform, conf_threshold=0.25, channels_first=True)
+    detections = decode_head(head, transform, conf_threshold=0.25, channels_first=True)
     assert len(detections) == 2
     assert detections[0].score == pytest.approx(0.9, abs=1e-6)
     assert detections[0].xyxy == pytest.approx((270.0, 140.0, 370.0, 340.0))
@@ -140,14 +140,14 @@ def test_decode_uses_the_person_column_only():
     head[0, 5, 0] = 0.99      # a bicycle, not a person
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     _, transform = letterbox(image, (640, 640))
-    assert decode_yolov8(head, transform, conf_threshold=0.25, channels_first=True) == []
+    assert decode_head(head, transform, conf_threshold=0.25, channels_first=True) == []
 
 
 def test_decode_rejects_an_unexpected_head_shape():
     image = np.zeros((480, 640, 3), dtype=np.uint8)
     _, transform = letterbox(image, (640, 640))
     with pytest.raises(ValueError, match="unexpected detection head"):
-        decode_yolov8(np.zeros((1, 3, 8)), transform, channels_first=True)
+        decode_head(np.zeros((1, 3, 8)), transform, channels_first=True)
 
 
 # -- the real model ----------------------------------------------------------

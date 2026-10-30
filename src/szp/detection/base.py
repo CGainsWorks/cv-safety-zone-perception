@@ -72,7 +72,7 @@ def default_model_path(explicit: Optional[str] = None) -> Path:
     env = os.environ.get("SZP_MODEL")
     if env:
         return Path(env)
-    return Path(__file__).resolve().parents[3] / "models" / "yolov8n.onnx"
+    return Path(__file__).resolve().parents[3] / "models" / "yolox_tiny.onnx"
 
 
 def build_detector(

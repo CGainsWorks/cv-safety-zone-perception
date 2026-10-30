@@ -18,10 +18,14 @@ compares each engine with ONNX Runtime on real photographs.  This script runs
 them in order, watches the machine and writes one compact summary to
 ``results/published/tensorrt.json``.
 
-Precisions.  FP32 and FP16.  There is no INT8 row because this repository has
-no INT8 path and no calibration set: the detector is Ultralytics' COCO
-checkpoint used as shipped and a calibration set carved out of val2017 would
-calibrate on the images it is then scored on.
+Precisions.  FP32, FP16 and INT8.  INT8 is calibrated on a fixed, seeded list
+of COCO train2017 photographs (``data/calibration_train2017.txt``), never on
+val2017, which is what it is scored on.  The box-for-box equivalence test is
+run against every engine but required only of FP32, which is the claim that the
+engine is the same model.  Reduced precision is allowed to move a borderline
+score across the threshold and its cost is the recall and MR-2 delta in its
+row, not a pass or fail; when the test fails, the assertion it failed on is
+recorded beside the row so the reader can see how far apart the two were.
 
 What the numbers are.  Desktop numbers from whichever NVIDIA GPU the container
 was given, an RTX 4060 under WSL2 for the published file.  Not Jetson numbers
@@ -44,7 +48,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-PRECISIONS = ("fp32", "fp16")
+PRECISIONS = ("fp32", "fp16", "int8")
+#: Precisions whose engine must agree with ONNX Runtime box for box.
+EQUIVALENCE_REQUIRED = ("fp32",)
 IDLE_UTILISATION_PERCENT = 10
 # A one-minute load average above this fraction of the logical cores counts as
 # a busy CPU.  Pre- and post-processing, fusion and the CAN path all run on the
@@ -109,7 +115,7 @@ def main(argv: list | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--model", default="models/yolov8n.onnx")
+    parser.add_argument("--model", default="models/yolox_tiny.onnx")
     parser.add_argument("--repeats", type=int, default=30, help="entry events for the latency run")
     parser.add_argument("--image", default=os.environ.get("TRT_IMAGE", "unknown"))
     parser.add_argument("--host-note", default="",
@@ -125,21 +131,32 @@ def main(argv: list | None = None) -> int:
     model = Path(args.model)
     engines = {p: model.with_name(f"{model.stem}_{p}.engine") for p in PRECISIONS}
 
-    before = watch(5)
-    for precision, engine in engines.items():
-        if args.reuse_engines and engine.exists():
-            continue
-        flag = "--fp16" if precision == "fp16" else "--no-fp16"
-        if run([python, "scripts/export_tensorrt.py", "--model", str(model),
-                "--engine", str(engine), flag]):
-            raise SystemExit(f"the {precision} engine did not build")
-
+    # The ONNX Runtime rows every engine is compared against.  They must come
+    # from the same graph the engines are built from: after a detector change
+    # the published files can still describe the previous model and every
+    # delta would then compare two different networks without saying so.
     published = json.loads(
         (REPO_ROOT / "results/published/detection_val2017.json").read_text(encoding="utf-8")
     )
     published_latency = json.loads(
         (REPO_ROOT / "results/published/latency_onnx.json").read_text(encoding="utf-8")
     )
+    for name, block in (("detection_val2017.json", published),
+                        ("latency_onnx.json", published_latency)):
+        if block["detector"]["model"] != model.name:
+            raise SystemExit(
+                f"results/published/{name} was measured on {block['detector']['model']}, "
+                f"not {model.name}; re-run and publish it before measuring the engines"
+            )
+
+    before = watch(5)
+    for precision, engine in engines.items():
+        if args.reuse_engines and engine.exists():
+            continue
+        if run([python, "scripts/export_tensorrt.py", "--model", str(model),
+                "--engine", str(engine), "--precision", precision]):
+            raise SystemExit(f"the {precision} engine did not build")
+
     rows = []
     for precision, engine in engines.items():
         detection_out = Path(f"results/tensorrt_detection_{precision}.json")
@@ -166,6 +183,11 @@ def main(argv: list | None = None) -> int:
         )
         print(equivalence.stdout.strip().splitlines()[-1], flush=True)
         matched = equivalence.returncode == 0 and " 1 passed" in equivalence.stdout
+        failure = next(
+            (line.strip()[1:].strip() for line in equivalence.stdout.splitlines()
+             if line.startswith("E ") and "Error:" in line),
+            None,
+        )
 
         detection = json.loads(detection_out.read_text(encoding="utf-8"))
         latency = json.loads(latency_out.read_text(encoding="utf-8"))
@@ -177,6 +199,7 @@ def main(argv: list | None = None) -> int:
             "precision": precision,
             "engine_bytes": card["engine_bytes"],
             "build_seconds": card["build_seconds"],
+            "calibration_images": card.get("calibration_images", 0),
             "recall_safety_015": sweep_row(safety, 0.15)["recall"],
             "recall_safety_025": sweep_row(safety, 0.25)["recall"],
             "recall_all_015": sweep_row(whole, 0.15)["recall"],
@@ -197,6 +220,8 @@ def main(argv: list | None = None) -> int:
             "reaction_events": latency["reaction_ms"]["n"],
             "can_interface": latency["can_interface"],
             "matches_onnx_on_coco": matched,
+            "equivalence_required": precision in EQUIVALENCE_REQUIRED,
+            "equivalence_failure": None if matched else failure,
         })
 
     time.sleep(5.0)  # keep this run's own tail out of the "after" sample
@@ -249,7 +274,9 @@ def main(argv: list | None = None) -> int:
     with open(out, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary, indent=2))
-    return 0 if all(row["matches_onnx_on_coco"] for row in rows) else 1
+    return 0 if all(
+        row["matches_onnx_on_coco"] for row in rows if row["equivalence_required"]
+    ) else 1
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ import numpy as np
 import onnxruntime as ort
 
 from szp.detection.base import DetectorConfig
-from szp.detection.postprocess import decode_yolov8
+from szp.detection.postprocess import decode_head
 from szp.detection.preprocess import letterbox
 from szp.types import Detection2D
 
@@ -64,7 +64,13 @@ class OnnxDetector:
         )
         self.input_name = self.session.get_inputs()[0].name
         shape = self.session.get_inputs()[0].shape
-        # A fixed-shape export pins the letterbox size; a dynamic one does not,
+        # The FP16 graph is exported from a half-precision module, so it takes
+        # float16 in.  Casting here keeps the letterbox shared and the cast
+        # inside the timed region is the cost a deployment would pay too.
+        self.input_dtype = (
+            np.float16 if self.session.get_inputs()[0].type == "tensor(float16)" else np.float32
+        )
+        # A fixed-shape export pins the letterbox size; a dynamic one does not
         # and using the configured size for a fixed model is a silent shape
         # error at the first inference.
         self.input_size = self.config.input_size
@@ -77,10 +83,11 @@ class OnnxDetector:
     def detect(self, bgr: np.ndarray) -> List[Detection2D]:
         tensor, transform = letterbox(bgr, self.input_size)
         start = time.perf_counter_ns()
-        outputs = self.session.run(None, {self.input_name: tensor})
+        feed = {self.input_name: tensor.astype(self.input_dtype, copy=False)}
+        outputs = self.session.run(None, feed)
         self._last_infer_ns = time.perf_counter_ns() - start
         self._infer_ns.append(self._last_infer_ns)
-        return decode_yolov8(
+        return decode_head(
             outputs[0],
             transform,
             conf_threshold=self.config.conf_threshold,
@@ -125,6 +132,7 @@ class OnnxDetector:
             "model_sha256_prefix": self._sha,
             "providers": list(self.session.get_providers()) if self.session else [],
             "input_size": list(self.input_size),
+            "input_dtype": np.dtype(self.input_dtype).name,
             "conf_threshold": self.config.conf_threshold,
             "iou_threshold": self.config.iou_threshold,
             "onnxruntime": ort.__version__,

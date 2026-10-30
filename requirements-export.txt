@@ -1,13 +1,31 @@
 # Export-time only.  Never installed into the runtime image.
 #
-# ULTRALYTICS IS AGPL-3.0.  It is used exactly once, by
-# scripts/export_onnx.py, to turn the published YOLOv8n checkpoint into an
-# ONNX graph.  Nothing under src/ imports it, so the shipped pipeline does not
-# link against AGPL code but the weights it exports are AGPL-3.0 and closed
-# commercial use needs an Ultralytics Enterprise Licence or another detector.
-# docs/licences.md states the obligation.
+# torch and yolox turn Megvii's YOLOX-Tiny COCO checkpoint into ONNX graphs
+# (scripts/fetch_model.py) and onnxruntime's quantiser builds the INT8 graph
+# (scripts/quantize_onnx.py).  YOLOX is Apache-2.0, code and weights alike;
+# docs/licences.md has the detail.  Nothing under src/ imports torch or yolox,
+# which keeps two gigabytes of wheel out of the runtime image.
+#
+# yolox itself is installed separately, because its setup.py imports torch to
+# decide whether to compile an optional C++ COCO evaluator and so needs torch
+# present and build isolation off:
+#
+#     pip install -r requirements-export.txt
+#     pip install --no-deps --no-build-isolation -r requirements-yolox.txt
 
 -r requirements.txt
-ultralytics>=8.3,<9
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.4
+torchvision>=0.19
 onnx>=1.16
 onnxslim>=0.1
+
+# yolox's own import-time dependencies, listed here because it is installed
+# with --no-deps.  Its requirements file pins onnx-simplifier 0.4.10, which
+# has no wheel for Python 3.12 and is not needed: onnxslim does that job.
+loguru>=0.7
+tabulate>=0.9
+thop>=0.1
+psutil>=5.9
+ninja>=1.11
+pycocotools>=2.0.7

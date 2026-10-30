@@ -61,7 +61,7 @@ jobs:
           # first.  If this ever stops working the job fails here rather than
           # falling back to python-can's in-process bus: "the safety tests run
           # over the real SocketCAN stack" is a claim this repository makes in
-          # its README, and a silent fallback would leave the claim false with
+          # its README and a silent fallback would leave the claim false with
           # the tick still green.
           sudo apt-get update -qq
           sudo apt-get install -y -qq "linux-modules-extra-$(uname -r)" \
@@ -86,7 +86,7 @@ jobs:
           # vcan0 exists, so without this the whole CAN suite could quietly run
           # on python-can's in-process bus and still go green.  Counting the
           # PASSED lines per test is deliberate: parsing pytest's summary line
-          # is what the first version did, and the summary is not always there.
+          # is what the first version did and the summary is not always there.
           test -e /sys/class/net/vcan0 || {
             echo "vcan0 does not exist; the CAN tests would fall back to the "\
                  "in-process bus" >&2
@@ -240,9 +240,9 @@ jobs:
           if-no-files-found: warn
 
   detector:
-    # Exports the real YOLOv8n model and runs it.  Separate from `check`
-    # because it installs the AGPL export toolchain and pulls torch, which is
-    # slow and has no business in the runtime image.
+    # Exports the real YOLOX-Tiny model from Megvii's checkpoint and runs it.
+    # Separate from `check` because it installs the export toolchain (torch
+    # and yolox), which is slow and has no business in the runtime image.
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -252,14 +252,19 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: requirements-export.txt
+          cache-dependency-path: |
+            requirements-export.txt
+            requirements-yolox.txt
 
       - name: Cache the exported model
+        # Keyed on the export code as well as the checkpoint, so a change to
+        # the fold or the in-graph decode re-exports rather than testing a
+        # stale graph.
         id: model-cache
         uses: actions/cache@v4
         with:
           path: models
-          key: yolov8n-onnx-v8.3.0-imgsz640-opset12
+          key: yolox-tiny-0.1.1rc0-imgsz640-opset13-${{ hashFiles('scripts/fetch_model.py', 'scripts/yolox_export.py', 'requirements-export.txt', 'requirements-yolox.txt') }}
 
       - name: Install
         run: |
@@ -270,6 +275,7 @@ jobs:
         if: steps.model-cache.outputs.cache-hit != 'true'
         run: |
           pip install -r requirements-export.txt
+          pip install --no-deps --no-build-isolation -r requirements-yolox.txt
           python scripts/fetch_model.py
 
       - name: The detector runs and the two backends share their pre and post
@@ -351,9 +357,13 @@ jobs:
           assert "not a Jetson" in trt["device"], trt["device"]
           pin = open("requirements-tensorrt.txt").read()
           assert f"tensorrt-cu12=={trt['host']['tensorrt']}" in pin, trt["host"]
+          assert [r["precision"] for r in trt["rows"]] == ["fp32", "fp16", "int8"]
           for row in trt["rows"]:
               print(row["variant"], row["recall_safety_015"], row["inference_p50_ms"], "ms")
-              assert row["matches_onnx_on_coco"], row
+              # INT8 is scored by its recall delta, not by box equality.
+              assert row["matches_onnx_on_coco"] or not row["equivalence_required"], row
+          int8 = trt["rows"][-1]
+          assert int8["calibration_images"] > 0, int8
           PY
 
   docker:
@@ -365,16 +375,16 @@ jobs:
       - name: Build the runtime image
         run: docker build -f docker/Dockerfile -t szp:ci .
 
-      - name: The image has no AGPL export toolchain in it
+      - name: The image has no export toolchain in it
         run: |
-          if docker run --rm szp:ci python -c "import ultralytics" 2>/dev/null; then
-            echo "ultralytics is in the runtime image; see docs/licences.md" >&2
-            exit 1
-          fi
-          if docker run --rm szp:ci python -c "import torch" 2>/dev/null; then
-            echo "torch is in the runtime image; the runtime is ONNX Runtime only" >&2
-            exit 1
-          fi
+          # ultralytics stays on the list because the detector used to be
+          # AGPL-3.0 YOLOv8 and must not come back by accident.
+          for module in torch yolox ultralytics; do
+            if docker run --rm szp:ci python -c "import $module" 2>/dev/null; then
+              echo "$module is in the runtime image; the runtime is ONNX Runtime only" >&2
+              exit 1
+            fi
+          done
           echo "runtime image is free of the export toolchain"
 
       - name: The tests pass inside the image

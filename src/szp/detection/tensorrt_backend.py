@@ -34,7 +34,7 @@ from typing import Dict, List, Optional
 import numpy as np
 
 from szp.detection.base import DetectorConfig
-from szp.detection.postprocess import decode_yolov8
+from szp.detection.postprocess import decode_head
 from szp.detection.preprocess import letterbox
 from szp.types import Detection2D
 
@@ -126,7 +126,7 @@ class TensorRTDetector:
         self.stream.synchronize()
         self._last_infer_ns = time.perf_counter_ns() - start
 
-        return decode_yolov8(
+        return decode_head(
             self._host[self._outputs[0]],
             transform,
             conf_threshold=self.config.conf_threshold,

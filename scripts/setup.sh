@@ -2,7 +2,7 @@
 # One command from a fresh clone to something that runs.
 #
 #     scripts/setup.sh              # runtime only
-#     scripts/setup.sh --export     # plus the AGPL export toolchain
+#     scripts/setup.sh --export     # plus the export toolchain (torch, yolox)
 #     scripts/setup.sh --data       # plus COCO val2017 (1 GB)
 #
 # Creates .venv, installs the pinned requirements, downloads and exports the
@@ -37,16 +37,17 @@ echo "==> installing requirements"
 "$VENV_PY" -m pip install -r requirements.txt
 
 if [ "$WANT_EXPORT" = "1" ]; then
-  echo "==> installing the export toolchain (ultralytics is AGPL-3.0; see docs/licences.md)"
+  echo "==> installing the export toolchain (torch and yolox)"
   "$VENV_PY" -m pip install -r requirements-export.txt
+  "$VENV_PY" -m pip install --no-deps --no-build-isolation -r requirements-yolox.txt
 fi
 
-if [ ! -f models/yolov8n.onnx ]; then
+if [ ! -f models/yolox_tiny.onnx ]; then
   if [ "$WANT_EXPORT" = "1" ]; then
     echo "==> exporting the detector"
     "$VENV_PY" scripts/fetch_model.py
   else
-    echo "==> no models/yolov8n.onnx yet."
+    echo "==> no models/yolox_tiny.onnx yet."
     echo "    Run 'scripts/setup.sh --export' to download and export it."
     echo "    Everything that does not need the detector works without it."
   fi

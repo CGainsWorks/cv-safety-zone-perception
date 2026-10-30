@@ -1,10 +1,12 @@
-"""Decoding a YOLOv8 head and non-maximum suppression.
+"""Decoding the detection head and non-maximum suppression.
 
 The raw head is ``(1, 4 + n_classes, n_anchors)``: four box parameters in
-letterboxed pixels as centre-x, centre-y, width, height, followed by one
-sigmoid score per class.  There is no objectness term in v8 and no anchor
-decoding to do -- the head is already in pixels -- so the only real work is
-picking the person column, thresholding and suppressing duplicates.
+letterboxed pixels as centre-x, centre-y, width, height, followed by one score
+per class in 0..1.  The detector is YOLOX-Tiny and its export
+(``scripts/yolox_export.py``) does the grid decode and multiplies objectness
+into the class scores inside the graph, so there is no objectness term left
+and no anchor decoding to do here.  The only real work is picking the person
+column, thresholding and suppressing duplicates.
 
 NMS is written out rather than taken from OpenCV so that the tie-breaking is
 deterministic.  A detector whose output depends on the order equal-scoring
@@ -22,7 +24,7 @@ import numpy as np
 from szp.detection.preprocess import LetterboxTransform
 from szp.types import Detection2D
 
-__all__ = ["decode_yolov8", "nms", "boxes_to_detections", "xywh_to_xyxy", "iou_matrix"]
+__all__ = ["decode_head", "nms", "boxes_to_detections", "xywh_to_xyxy", "iou_matrix"]
 
 PERSON_CLASS_INDEX = 0
 
@@ -75,7 +77,7 @@ def nms(boxes: np.ndarray, scores: np.ndarray, iou_threshold: float = 0.5) -> Li
     return keep
 
 
-def decode_yolov8(
+def decode_head(
     output: np.ndarray,
     transform: LetterboxTransform,
     *,

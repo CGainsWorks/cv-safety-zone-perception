@@ -17,7 +17,7 @@ Two detector choices and the difference matters:
     right, because the 3D error is then the fusion error and nothing else.
 
 ``--detector onnx``
-    The real YOLOv8n ONNX model, run on the rendered frames.  Use this when the
+    The real YOLOX-Tiny ONNX model, run on the rendered frames.  Use this when the
     question is *how long a frame takes*.  Do not read anything into the
     detections: rendered cylinders are not people and detection accuracy is
     measured on COCO by ``analysis/detection_metrics.py`` instead.

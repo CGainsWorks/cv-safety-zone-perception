@@ -68,14 +68,20 @@ def render(summary: dict) -> str:
         "Reaction at the PLC p50 / p99 | Same detections as ONNX |",
         "|---|---|---|---|---|---|---|---|",
     ]
+    failures = []
     for row in rows:
+        if row["matches_onnx_on_coco"]:
+            same = "yes"
+        else:
+            failures.append(row)
+            same = "no, required" if row.get("equivalence_required", True) else "no, see below"
         lines.append(
             f"| TensorRT {row['precision'].upper()} | {row['recall_safety_015'] * 100:.1f} % | "
             f"{row['recall_safety_025'] * 100:.1f} % | {row['mr2_safety']:.3f} | "
             f"{row['inference_p50_ms']:.2f} / {row['inference_p99_ms']:.2f} ms | "
             f"{row['pipeline_p50_ms']:.2f} / {row['pipeline_p99_ms']:.2f} ms | "
             f"{row['reaction_p50_ms']:.2f} / {row['reaction_p99_ms']:.2f} ms | "
-            f"{'yes' if row['matches_onnx_on_coco'] else 'NO'} |"
+            f"{same} |"
         )
     lines.append(
         f"| ONNX Runtime, CPU (published) | {reference['recall_safety_015'] * 100:.1f} % | "
@@ -83,6 +89,19 @@ def render(summary: dict) -> str:
         f"{reference['inference_p50_ms']:.2f} ms p50 | {reference['pipeline_p50_ms']:.2f} ms p50 "
         "| see above | reference |"
     )
+    if failures:
+        lines.append("")
+        lines.append(
+            "The box-for-box equivalence test on 16 COCO photographs with people in them "
+            "is required of FP32 only; where an engine did not pass it, the first "
+            "difference it found:"
+        )
+        lines.append("")
+        for row in failures:
+            lines.append(
+                f"* TensorRT {row['precision'].upper()}: "
+                f"{row.get('equivalence_failure') or 'no assertion message recorded'}"
+            )
     return "\n".join(lines) + "\n"
 
 

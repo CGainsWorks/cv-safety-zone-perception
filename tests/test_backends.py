@@ -37,7 +37,7 @@ def test_both_backends_share_the_preprocessing_and_the_decoder():
     onnx_source = inspect.getsource(onnx_backend)
     trt_source = inspect.getsource(tensorrt_backend)
     for symbol in ("from szp.detection.preprocess import letterbox",
-                   "from szp.detection.postprocess import decode_yolov8"):
+                   "from szp.detection.postprocess import decode_head"):
         assert symbol in onnx_source, symbol
         assert symbol in trt_source, symbol
     # Neither backend may define its own.
