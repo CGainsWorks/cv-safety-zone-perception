@@ -105,9 +105,12 @@ mitigation at all.
 
 There is no GPU on GitHub's runners, so `scripts/export_tensorrt.py` never runs
 there and `tests/test_backends.py::test_tensorrt_matches_onnx` skips. A skipped
-test is not a passing test. The equivalence check runs on a machine with a GPU
-and `docs/tensorrt.md` records which one; between those runs, the claim that
-the TensorRT path produces the same detections as the ONNX path is untested.
+test is not a passing test. CI does check every TensorRT symbol the code uses
+against the pinned wheel. The equivalence check passed on a desktop RTX 4060
+against FP32 and FP16 engines, as `results/published/tensorrt.json` records;
+between runs of `make tensorrt-desktop` the claim that the TensorRT path
+produces the same detections as the ONNX path is untested. Nothing has run on
+a Jetson.
 
 ## The false-positive cost is a safety issue, not only a commercial one
 

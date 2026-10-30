@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -134,6 +135,28 @@ def expected_numbers() -> Tuple[List[Tuple[str, str]], List[str]]:
     return checks, skipped
 
 
+def check_tensorrt_table() -> List[str]:
+    """The generated TensorRT table must match results/published/tensorrt.json."""
+    summary_path = PUBLISHED / "tensorrt.json"
+    if not summary_path.exists():
+        return []
+    sys.path.insert(0, str(REPO_ROOT / "analysis"))
+    try:
+        import tensorrt_table
+    finally:
+        sys.path.pop(0)
+    body = tensorrt_table.render(json.loads(summary_path.read_text(encoding="utf-8")))
+    problems = []
+    for document in tensorrt_table.DOCUMENTS:
+        match = tensorrt_table.BLOCK.search(document.read_text(encoding="utf-8"))
+        if match is None or match.group(2) != body:
+            problems.append(
+                f"{document.name}: the TensorRT table is missing or stale; "
+                "run python analysis/tensorrt_table.py"
+            )
+    return problems
+
+
 def check_links(text: str, source: Path) -> List[str]:
     problems = []
     for target in LINK.findall(text):
@@ -178,6 +201,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if "not a certified safety function" not in text.lower():
         problems.append("the README does not say it is not a certified safety function")
 
+    problems += check_tensorrt_table()
     problems += check_links(text, readme_path)
     for doc in sorted((REPO_ROOT / "docs").glob("*.md")):
         problems += [

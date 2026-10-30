@@ -13,9 +13,12 @@
 #             cores, most of it inference.
 #               make model  make data  make experiments
 #
-#   GPU       needs an NVIDIA GPU and TensorRT.  Not run by CI and no number in
-#             this repository comes from it yet; see docs/tensorrt.md.
-#               make engine  make trt-check
+#   GPU       needs an NVIDIA GPU.  Not run by CI, which has no GPU.
+#             `make tensorrt-desktop` builds the FP32 and FP16 engines in
+#             NVIDIA's TensorRT container, scores them on COCO, times the
+#             pipeline and writes results/published/tensorrt.json; it ran on a
+#             desktop RTX 4060, never on a Jetson.  See docs/tensorrt.md.
+#               make tensorrt-desktop  make engine  make trt-check
 #
 # `make check` is exactly what CI runs.
 
@@ -148,6 +151,19 @@ latency:  ## End-to-end latency budget, with the real model and without it
 # ---------------------------------------------------------------------------
 # GPU
 # ---------------------------------------------------------------------------
+
+TRT_TAG ?= 25.06-py3
+COCO_ROOT ?= $(HOME)/datasets/coco
+
+.PHONY: tensorrt-desktop
+tensorrt-desktop:  ## Build, score and time TensorRT engines on this GPU (Docker)
+	docker build -f docker/Dockerfile.tensorrt --build-arg TRT_TAG=$(TRT_TAG) \
+	  -t szp:tensorrt .
+	docker run --rm --gpus all --network none \
+	  -e TRT_IMAGE=nvcr.io/nvidia/tensorrt:$(TRT_TAG) -e SZP_COCO_ROOT=/coco \
+	  -v "$(CURDIR):/work" -v "$(COCO_ROOT):/coco:ro" \
+	  szp:tensorrt python3 scripts/measure_tensorrt.py
+	$(VENV_PY) analysis/tensorrt_table.py
 
 .PHONY: engine
 engine:  ## Build a TensorRT engine (needs an NVIDIA GPU; never committed)

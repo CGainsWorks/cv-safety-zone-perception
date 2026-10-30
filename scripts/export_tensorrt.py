@@ -4,10 +4,11 @@
     python scripts/export_tensorrt.py --fp16
 
 Needs a machine with an NVIDIA GPU and TensorRT installed.  It does not run in
-CI and it did not run on the machine that produced most of the numbers in this
-repository; ``docs/tensorrt.md`` says exactly which machine it did run on and
-what came out.  Running it somewhere else will give different numbers, which is
-the whole point of writing them down.
+CI, which has no GPU.  ``make tensorrt-desktop`` runs it inside NVIDIA's
+TensorRT container on a desktop RTX 4060; ``docs/tensorrt.md`` and
+``results/published/tensorrt.json`` say exactly which machine and versions and
+what came out.  Running it somewhere else will give different numbers, which
+is the whole point of writing them down.
 
 Engines are **never committed**.  A serialised TensorRT plan is tied to the
 GPU architecture, the driver and the TensorRT version that built it and an

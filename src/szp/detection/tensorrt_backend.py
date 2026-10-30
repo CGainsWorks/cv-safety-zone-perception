@@ -1,16 +1,23 @@
 """TensorRT backend.
 
-Not exercised by CI.  GitHub's runners have no NVIDIA GPU, so nothing in this
+Run for real on a desktop RTX 4060 inside NVIDIA's TensorRT container
+(``make tensorrt-desktop``): it scored the FP32 and FP16 engines on COCO
+val2017 and timed the whole pipeline and
+``tests/test_backends.py::test_tensorrt_matches_onnx`` compared it with ONNX
+Runtime on real photographs.  Never run on a Jetson.
+
+Not executed by CI.  GitHub's runners have no NVIDIA GPU, so nothing in this
 file runs there and it would be dishonest to let a green tick imply otherwise.
-What CI does check is that the module imports cleanly and that its pre- and
-post-processing are the shared ones from ``preprocess`` and ``postprocess``,
-which is where a divergence between the two backends would show up.  The
-equivalence test itself, ``tests/test_backends.py::test_tensorrt_matches_onnx``,
-skips without a GPU and runs on a machine with one.
+What CI does check is that the module imports, that every TensorRT symbol it
+uses exists in the pinned wheel (the ``tensorrt-api`` job) and that its pre-
+and post-processing are the shared ones from ``preprocess`` and
+``postprocess``, which is where a divergence between the two backends would
+show up.
 
 Written against the TensorRT 10 API, which replaced the binding-index calls of
-TensorRT 8 with named tensors.  ``docs/tensorrt.md`` records the exact
-versions and the machine the published latency numbers came from.
+TensorRT 8 with named tensors.  ``docs/tensorrt.md`` and
+``results/published/tensorrt.json`` record the exact versions and the machine
+the published TensorRT numbers came from.
 
 Memory is allocated once at construction and reused.  A per-frame
 ``cudaMalloc`` costs a few hundred microseconds and, worse, is a per-frame

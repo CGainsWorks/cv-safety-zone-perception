@@ -122,10 +122,11 @@ growing before it becomes a deadline miss.
 
 ## TensorRT
 
-`docs/tensorrt.md` covers the export and the numbers. The short version: the
-engine is not built or measured in CI because CI has no GPU and a repository
-that quoted a TensorRT speed-up it had never measured would be worth less than
-one that says it has not.
+`docs/tensorrt.md` covers the export and the numbers. The short version: on a
+desktop RTX 4060, inside NVIDIA's TensorRT container, the detector falls to a
+few milliseconds and frame to bus to under 5 ms at p50, with the same recall.
+That is a desktop measurement, not a Jetson one and it is not repeated in CI
+because CI has no GPU.
 
 ## Timing hygiene
 

@@ -324,6 +324,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         help="pixel height below which a person is outside the sensor's working range",
     )
     parser.add_argument("--conf-floor", type=float, default=0.05)
+    parser.add_argument("--backend", default="auto", choices=("auto", "onnx", "tensorrt"))
+    parser.add_argument("--engine", default=None, help="a TensorRT engine other than the default")
     parser.add_argument("--out", default=None)
     parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
@@ -332,7 +334,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not args.quiet:
         print(json.dumps(dataset.summary(), indent=2))
 
-    detector = build_detector(args.model, DetectorConfig(conf_threshold=args.conf_floor))
+    detector = build_detector(
+        args.model,
+        DetectorConfig(conf_threshold=args.conf_floor),
+        backend=args.backend,
+        engine_path=args.engine,
+    )
     detector.warmup(5)
     try:
         results = evaluate(

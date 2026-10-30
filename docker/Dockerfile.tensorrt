@@ -1,0 +1,42 @@
+# Desktop TensorRT image: this repository's TensorRT backend on an x86 NVIDIA GPU.
+#
+# Not a Jetson image.  It exists so that scripts/export_tensorrt.py and
+# szp.detection.tensorrt_backend run for real somewhere, on the desktop RTX 4060
+# that is available, instead of waiting for a Xavier NX that is not.  Whatever
+# it produces is a desktop number and is labelled that way in
+# results/published/tensorrt.json and in the README table generated from it.
+#
+# The base is NVIDIA's official TensorRT container, pinned by tag:
+#   25.06-py3   TensorRT 10.11.0.33, CUDA 12.9.1, Python 3.12, pycuda 2025.1.1
+# It needs a driver new enough for CUDA 12.9 and Docker with GPU support
+# (`docker run --gpus all`; under WSL2, Docker Desktop provides it).  The
+# runtime dependencies are pinned to versions built against the image's
+# NumPy 1.26, because the bundled pycuda is compiled against NumPy 1.x.
+#
+#   make tensorrt-desktop
+#
+# Engines built in it are tied to this GPU, driver and TensorRT version and are
+# never committed.
+
+ARG TRT_TAG=25.06-py3
+FROM nvcr.io/nvidia/tensorrt:${TRT_TAG}
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/work/src
+
+RUN python3 -m pip install --no-cache-dir \
+      numpy==1.26.4 \
+      scipy==1.15.3 \
+      opencv-python-headless==4.11.0.86 \
+      PyYAML==6.0.2 \
+      python-can==4.5.0 \
+      matplotlib==3.9.4 \
+      tqdm==4.67.1 \
+      onnxruntime==1.22.0 \
+      pytest==8.4.1 \
+ && python3 -c "import tensorrt, pycuda, cv2, can, numpy; print(tensorrt.__version__, numpy.__version__)"
+
+# The repository is bind mounted here at run time, so engines and results land
+# in the working tree.
+WORKDIR /work

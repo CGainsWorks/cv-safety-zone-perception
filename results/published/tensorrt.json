@@ -1,0 +1,92 @@
+{
+  "device": "desktop RTX 4060, not a Jetson",
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 4060",
+    "gpu_memory_mib": 8188,
+    "driver": "591.86",
+    "cuda_runtime": "12.9.1.010",
+    "tensorrt": "10.11.0.33",
+    "pycuda": "2025.1.1",
+    "container_image": "nvcr.io/nvidia/tensorrt:25.06-py3",
+    "under": "WSL2 Docker",
+    "cpu_count": 16
+  },
+  "gpu_contention": {
+    "idle_threshold_percent": 10,
+    "before": {
+      "samples": 5,
+      "utilisation_percent_max": 12,
+      "memory_used_mib_max": 1126,
+      "compute_processes_max": 0,
+      "cpu_load_1min_max": 0.54
+    },
+    "after": {
+      "samples": 5,
+      "utilisation_percent_max": 1,
+      "memory_used_mib_max": 1239,
+      "compute_processes_max": 0,
+      "cpu_load_1min_max": 1.08
+    },
+    "contended": true,
+    "busy_cpu_threshold_load": 4.0,
+    "cpu_busy": false,
+    "host_note": "host nvidia-smi, sampled every 5 s through the run, listed no other compute process"
+  },
+  "dataset": "COCO val2017",
+  "images": 5000,
+  "onnx_reference": {
+    "recall_safety_015": 0.8816568047337278,
+    "mr2_safety": 0.22660716112299895,
+    "inference_p50_ms": 26.318,
+    "pipeline_p50_ms": 31.11,
+    "provider": "CPUExecutionProvider"
+  },
+  "rows": [
+    {
+      "variant": "tensorrt-fp32",
+      "precision": "fp32",
+      "engine_bytes": 23632180,
+      "build_seconds": 68.9,
+      "recall_safety_015": 0.8812341504649197,
+      "recall_safety_025": 0.8396731473654551,
+      "recall_all_015": 0.7263616962048808,
+      "fp_per_image_safety_015": 0.4188,
+      "mr2_safety": 0.22680280171562048,
+      "mr2_all": 0.4161696938600915,
+      "recall_safety_015_delta_vs_onnx": -0.00042,
+      "mr2_safety_delta_vs_onnx": 0.0002,
+      "inference_p50_ms": 2.858,
+      "inference_p99_ms": 3.569,
+      "pipeline_p50_ms": 4.601,
+      "pipeline_p99_ms": 8.917,
+      "reaction_p50_ms": 7.605,
+      "reaction_p99_ms": 8.417,
+      "reaction_events": 29,
+      "can_interface": "virtual",
+      "matches_onnx_on_coco": true
+    },
+    {
+      "variant": "tensorrt-fp16",
+      "precision": "fp16",
+      "engine_bytes": 10419844,
+      "build_seconds": 182.0,
+      "recall_safety_015": 0.8815159199774585,
+      "recall_safety_025": 0.8393913778529163,
+      "recall_all_015": 0.726640066808945,
+      "fp_per_image_safety_015": 0.4194,
+      "mr2_safety": 0.22667951308055018,
+      "mr2_all": 0.416059598919586,
+      "recall_safety_015_delta_vs_onnx": -0.00014,
+      "mr2_safety_delta_vs_onnx": 7e-05,
+      "inference_p50_ms": 2.239,
+      "inference_p99_ms": 4.95,
+      "pipeline_p50_ms": 3.993,
+      "pipeline_p99_ms": 8.288,
+      "reaction_p50_ms": 7.269,
+      "reaction_p99_ms": 9.564,
+      "reaction_events": 29,
+      "can_interface": "virtual",
+      "matches_onnx_on_coco": true
+    }
+  ]
+}

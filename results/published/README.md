@@ -13,6 +13,7 @@ drift from the measurements without the build going red.
 | `demo.json`, `demo_timeline.csv` | `scripts/run_demo.py` | the whole pipeline over the reference scene, with the state machine and the simulated PLC |
 | `calibration_self_check.json` | `scripts/calibrate.py --self-check` | how well the camera-lidar solver recovers a transform it was not told |
 | `benchmark.json` | `scripts/benchmark.py` | per-stage micro-benchmarks and the detector's warm-up curve |
+| `tensorrt.json` | `scripts/measure_tensorrt.py` (`make tensorrt-desktop`) | FP32 and FP16 TensorRT engines on a desktop RTX 4060: COCO recall and MR-2, pipeline latency, agreement with ONNX Runtime, versions and contention |
 
 ## Regenerating them
 
@@ -31,8 +32,11 @@ the machine that produced it. `benchmark.json` has the fullest record:
 platform, processor, Python and numpy versions and the detector's execution
 provider.
 
-None of these numbers came from a Jetson, a GPU or a TensorRT engine. See
-`docs/tensorrt.md`, which says so at more length.
+None of these numbers came from a Jetson.  Only `tensorrt.json` came from a
+GPU: a desktop RTX 4060 running TensorRT engines in NVIDIA's container, written
+by `scripts/measure_tensorrt.py` and recording the driver, CUDA and TensorRT
+versions and the contention state.  Everything else is CPU.  See
+`docs/tensorrt.md`.
 
 ## Two kinds of number and the difference matters
 

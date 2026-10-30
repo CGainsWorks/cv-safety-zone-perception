@@ -80,6 +80,7 @@ def build_detector(
     config: Optional[DetectorConfig] = None,
     *,
     backend: str = "auto",
+    engine_path: Optional[str] = None,
 ) -> Detector:
     """Construct a detector.
 
@@ -88,6 +89,9 @@ def build_detector(
     imports and otherwise falls back to ONNX Runtime.  It never silently
     substitutes one for the other without saying so: the chosen backend is in
     ``detector.info`` and every result file records it.
+
+    ``engine_path`` names a specific engine instead of the one next to the
+    ONNX file, which is how the FP32 and FP16 engines are scored side by side.
     """
     path = default_model_path(model_path)
     config = config or DetectorConfig()
@@ -96,7 +100,7 @@ def build_detector(
         raise ValueError(f"unknown backend '{backend}'")
 
     if backend in ("auto", "tensorrt"):
-        engine = path.with_suffix(".engine")
+        engine = Path(engine_path) if engine_path else path.with_suffix(".engine")
         if backend == "tensorrt" or engine.exists():
             try:
                 from szp.detection.tensorrt_backend import TensorRTDetector

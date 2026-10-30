@@ -114,17 +114,20 @@ def measure(
     can_interface: Optional[str],
     channel: Optional[str],
     repeats: int,
+    backend: str = "onnx",
+    engine: Optional[str] = None,
 ) -> Dict[str, object]:
     truth_detector = SimulatedDetector(scene, miss_probability=0.0, false_positive_rate=0.0)
     if detector_kind == "simulated":
         detector = truth_detector
     elif detector_kind == "onnx_timing":
         detector = TimedRealDetector(
-            build_detector(model, DetectorConfig(), backend="onnx"), truth_detector
+            build_detector(model, DetectorConfig(), backend=backend, engine_path=engine),
+            truth_detector,
         )
         detector.warmup(10)
     else:
-        detector = build_detector(model, DetectorConfig(), backend="onnx")
+        detector = build_detector(model, DetectorConfig(), backend=backend, engine_path=engine)
         detector.warmup(10)
     feeds_truth = hasattr(detector, "set_truth")
 
@@ -276,6 +279,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         default="onnx_timing",
     )
     parser.add_argument("--model", default=None)
+    parser.add_argument(
+        "--backend",
+        default="onnx",
+        choices=("onnx", "tensorrt"),
+        help="runtime for the real detector; the detector kinds keep their names",
+    )
+    parser.add_argument("--engine", default=None, help="the TensorRT engine to load")
     parser.add_argument("--repeats", type=int, default=30, help="how many entry events")
     parser.add_argument("--dwell", type=float, default=0.8)
     parser.add_argument(
@@ -303,6 +313,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         can_interface=args.can,
         channel=args.channel,
         repeats=args.repeats,
+        backend=args.backend,
+        engine=args.engine,
     )
     report["scene"] = scene.summary()
 

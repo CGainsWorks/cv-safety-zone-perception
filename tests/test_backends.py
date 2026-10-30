@@ -21,6 +21,8 @@ and this file names it.
 from __future__ import annotations
 
 import inspect
+import os
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -50,21 +52,50 @@ def test_the_tensorrt_backend_imports_without_a_gpu():
     assert isinstance(tensorrt_backend.tensorrt_available(), bool)
 
 
+def _equivalence_images(count: int = 16):
+    """Real photographs of people when COCO is on disk, noise otherwise.
+
+    Noise alone makes a weak test: at this threshold it produces no detections
+    and every comparison passes by being empty.  So when val2017 is present
+    the first images with a person at least 50 px tall are used and the test
+    requires that something was actually compared.
+    """
+    try:
+        import cv2
+
+        from szp.data.coco import CocoPersonDataset
+
+        dataset = CocoPersonDataset(split="val2017")
+        chosen = dataset.with_people(min_height_px=50.0)[:count]
+        images = [cv2.imread(str(item.path)) for item in chosen]
+        if images and all(image is not None for image in images):
+            return images, True
+    except (FileNotFoundError, OSError, ImportError):
+        pass
+    rng = np.random.default_rng(0)
+    return [rng.integers(0, 255, (480, 640, 3), dtype=np.uint8) for _ in range(8)], False
+
+
 @pytest.mark.needs_model
 def test_tensorrt_matches_onnx(model_path):
-    """The equivalence check itself.  Skips without a GPU and an engine."""
+    """The equivalence check itself.  Skips without a GPU and an engine.
+
+    ``SZP_ENGINE`` names an engine other than the one next to the ONNX file,
+    which is how ``scripts/measure_tensorrt.py`` runs it against the FP32 and
+    the FP16 engine in turn.
+    """
     if not tensorrt_backend.tensorrt_available():
         pytest.skip("no tensorrt/pycuda on this machine")
-    engine = model_path.with_suffix(".engine")
+    engine = Path(os.environ.get("SZP_ENGINE") or model_path.with_suffix(".engine"))
     if not engine.exists():
         pytest.skip(f"no engine at {engine}; build one with scripts/export_tensorrt.py")
 
-    rng = np.random.default_rng(0)
-    images = [rng.integers(0, 255, (480, 640, 3), dtype=np.uint8) for _ in range(8)]
+    images, real = _equivalence_images()
 
     config = DetectorConfig(conf_threshold=0.20)
     reference = build_detector(str(model_path), config, backend="onnx")
-    candidate = build_detector(str(model_path), config, backend="tensorrt")
+    candidate = build_detector(str(model_path), config, backend="tensorrt", engine_path=engine)
+    compared = 0
     try:
         reference.warmup(2)
         candidate.warmup(5)
@@ -81,9 +112,12 @@ def test_tensorrt_matches_onnx(model_path):
             scores_a = np.sort([d.score for d in a])
             scores_b = np.sort([d.score for d in b])
             assert np.allclose(scores_a, scores_b, atol=0.05), f"image {index}: scores disagree"
+            compared += len(a)
     finally:
         reference.close()
         candidate.close()
+    if real:
+        assert compared > 0, "no detections on real photographs; the comparison checked nothing"
 
 
 @pytest.mark.needs_model

@@ -150,7 +150,34 @@ scan cycle, which on real hardware are often larger than everything above.
 
 Reproduce: `make latency`.
 
-### 4. Calibration
+### 4. TensorRT, measured on a desktop RTX 4060 (not a Jetson)
+
+The same detector through this repository's TensorRT backend, engines built by
+`scripts/export_tensorrt.py` in NVIDIA's TensorRT container, scored by the same
+COCO code and timed through the same pipeline as the tables above.  The table
+is generated from `results/published/tensorrt.json`.
+
+<!-- BEGIN generated:tensorrt -->
+Measured on a desktop RTX 4060, not a Jetson.  Driver `591.86`, CUDA `12.9.1.010`, TensorRT `10.11.0.33`, image `nvcr.io/nvidia/tensorrt:25.06-py3` under WSL2 Docker.  GPU: no other compute process listed but utilisation reached 12 % in the idle windows before or after the run, above the 10 % threshold; this GPU also drives the desktop display (host nvidia-smi, sampled every 5 s through the run, listed no other compute process).  CPU not busy, load average 0.54 before and 1.08 after on 16 logical cores shared with other containers.  Recall on COCO val2017, 5000 images; latency over 29 entry events on python-can's `virtual` bus.
+
+| Detector | Recall, safety subset, 0.15 | Recall, safety subset, 0.25 | MR-2, safety subset | Inference p50 / p99 | Pipeline p50 / p99 | Reaction at the PLC p50 / p99 | Same detections as ONNX |
+|---|---|---|---|---|---|---|---|
+| TensorRT FP32 | 88.1 % | 84.0 % | 0.227 | 2.86 / 3.57 ms | 4.60 / 8.92 ms | 7.61 / 8.42 ms | yes |
+| TensorRT FP16 | 88.2 % | 83.9 % | 0.227 | 2.24 / 4.95 ms | 3.99 / 8.29 ms | 7.27 / 9.56 ms | yes |
+| ONNX Runtime, CPU (published) | 88.2 % | see above | 0.227 | 26.32 ms p50 | 31.11 ms p50 | see above | reference |
+<!-- END generated:tensorrt -->
+
+Recall does not move: the two engines find the same people as ONNX Runtime and
+the equivalence test passed on real photographs for both.  The detector stops
+being most of the budget: frame to bus falls from 31.1 ms to under 5 ms at p50.
+These are desktop numbers.  No Jetson was available, so the Xavier NX figure
+is a hardware TODO in [STATUS.md](STATUS.md) and CI, which has no GPU, checks
+the TensorRT code against the pinned wheel without building an engine.
+[docs/tensorrt.md](docs/tensorrt.md) has the detail.
+
+Reproduce: `make tensorrt-desktop` (an NVIDIA GPU and Docker).
+
+### 5. Calibration
 
 The camera-to-lidar extrinsic is solved by the planar-target method of Zhang
 and Pless, from a checkerboard alone. `scripts/calibrate.py --self-check`
@@ -235,10 +262,10 @@ config/             zones.yaml, extrinsics.yaml
 analysis/           the scripts every published number comes from and the FMEA
 scripts/            setup, fetch, demo, calibrate, export, benchmark, figures
 results/published/  the result files the README quotes
-docs/               disclaimer, design, zones, latency, calibration, CAN, licences
+docs/               disclaimer, design, zones, latency, calibration, CAN, TensorRT, licences
 ```
 
-`src/szp/…` rather than the flat `src/detection/…` the brief proposed: a flat
+`src/szp/…` rather than the flat `src/detection/…` the original plan proposed: a flat
 `src/` is not importable as a package without path games. That is the only
 deviation.
 
@@ -246,14 +273,19 @@ deviation.
 
 ## Licence
 
-MIT, in [LICENSE](LICENSE).
+The code is MIT, in [LICENSE](LICENSE).
 
-The detector weights come from ultralytics, which is **AGPL-3.0**. It is used
-exactly once, by `scripts/fetch_model.py`, to produce the ONNX file and it is
-in `requirements-export.txt` and not in `requirements.txt`. Nothing under
-`src/` imports it or torch. CI **fails the build** if either turns up in the
-runtime Docker image. [docs/licences.md](docs/licences.md) sets out what that
-does and does not buy you and what to do if you want to use this commercially.
+**The detector weights are AGPL-3.0.** They are Ultralytics' published COCO
+YOLOv8n checkpoint, converted to ONNX and not retrained, so any deployment with
+them must meet AGPL-3.0 and closed commercial use needs an Ultralytics
+Enterprise Licence or a different detector. The `ultralytics` package itself is
+used exactly once, by `scripts/fetch_model.py` and is in
+`requirements-export.txt` and not in `requirements.txt`. Nothing under `src/`
+imports it or torch and CI **fails the build** if either turns up in the
+runtime Docker image; that keeps Ultralytics' code out of the deployment but
+does not free the weights. [docs/licences.md](docs/licences.md) states the
+obligation. Swapping to an Apache-2.0 detector (YOLOX, RTMDet or D-FINE) is an
+open item in [STATUS.md](STATUS.md).
 
 Datasets and their terms: [data/DATASET_CARD.md](data/DATASET_CARD.md). Nothing
 is redistributed by this repository and nothing here is trained.
