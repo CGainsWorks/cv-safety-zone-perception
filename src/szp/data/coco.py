@@ -194,7 +194,10 @@ class CocoPersonDataset:
         )
         return {
             "split": self.split,
-            "root": str(self.root),
+            # The directory name only.  The full path records the machine the
+            # result was produced on, which is not a property of the result
+            # and once leaked a local home directory into a published file.
+            "root": self.root.name,
             "images": images,
             "people": people,
             "crowd_regions": crowds,

@@ -26,6 +26,9 @@ models/
 data/coco/
 datasets/
 
+# Ultralytics writes its own run directory wherever the export is run from.
+runs/
+
 # Run outputs.  results/published/ is tracked and is the exception.
 results/*
 !results/.gitkeep

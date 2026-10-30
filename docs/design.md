@@ -184,7 +184,7 @@ latching, fault dominance, no self-clearing on reset alone and monotone entry.
 
 ## Layout
 
-The brief proposed `src/detection/`, `src/fusion/` and so on. This repository
+The original plan proposed `src/detection/`, `src/fusion/` and so on. This repository
 uses `src/szp/detection/` and so on -- the same structure one level down, in a
 package. A flat `src/` is not importable as a package without path games and
 `szp` is short enough not to be a nuisance. That is the only deviation.

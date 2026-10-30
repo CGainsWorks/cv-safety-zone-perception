@@ -618,7 +618,7 @@
   },
   "dataset": {
     "split": "val2017",
-    "root": "C:\\Users\\user\\datasets\\coco",
+    "root": "coco",
     "images": 5000,
     "people": 10777,
     "crowd_regions": 227,
