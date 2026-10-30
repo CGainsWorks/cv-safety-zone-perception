@@ -29,19 +29,40 @@ The Docker images follow the same split: `docker/Dockerfile` installs the
 runtime only and `docker/Dockerfile.export` is a separate image for the export
 step.
 
-### What that does and does not buy you
+### The obligation, stated plainly
 
-It keeps the deployed image free of AGPL code, which is the part most people
-care about. It does **not** settle the question of whether the *weights* are a
-derivative work of the AGPL codebase or what the AGPL's network clause implies
-for a model exported from it. That is a question for a lawyer and this file is
-not one.
+**The detector weights are AGPL-3.0 and that blocks closed commercial use.**
+`models/yolov8n.onnx` is Ultralytics' published COCO checkpoint
+(`yolov8n.pt`, AGPL-3.0) converted to ONNX; it is not retrained here, so it is
+the same weights in a different file format.  Ultralytics licenses its models
+under AGPL-3.0 and offers an Enterprise Licence for use outside it.  So any
+deployment of this pipeline with these weights, including one reached over a
+network, must meet AGPL-3.0: the complete corresponding source of the deployed
+system, under AGPL-3.0, to every user who interacts with it.  A closed or
+commercial deployment needs an Ultralytics Enterprise Licence or a different
+detector.  The MIT licence on this repository covers the code written here; it
+does not relicense the weights and cannot.
 
-**If you intend to use this commercially, the sane options are:** buy an
-Ultralytics enterprise licence or replace the detector with a permissively
-licensed one. The pipeline does not care -- `src/szp/detection/base.py` takes
-any ONNX graph with a YOLO-style head and the decoder in `postprocess.py` has
-a `class_index` argument for models whose person class is not zero.
+An earlier version of this section said the keeping of ultralytics out of the
+runtime "keeps the deployed image free of AGPL code" and left the weights as an
+open question.  The first half is true of the code and the second half is not
+open: the weights are Ultralytics' AGPL-3.0 model.
+
+### What the runtime split does buy
+
+It keeps Ultralytics' *code* and torch out of the deployed image, which is
+worth having because it is the part a detector swap would not need to touch.
+It does not remove the obligation attached to the weights, which travel inside
+the ONNX graph whichever runtime loads it, TensorRT included.
+
+**The fix is a detector that is permissively licensed end to end, weights
+included:** YOLOX, RTMDet or D-FINE, all Apache-2.0.  `STATUS.md` carries it as
+an open item; it has not been done in this pass, so the detector and its
+numbers are unchanged.  The pipeline is ready for it:
+`src/szp/detection/base.py` takes any ONNX graph and the decoder in
+`postprocess.py` has a `class_index` argument for models whose person class is
+not zero.  A detector whose head is not YOLOv8-shaped (YOLOX, RTMDet) needs a
+second decoder there.
 
 ## Datasets
 
@@ -86,8 +107,11 @@ modified copy, read the licence.
 | pycuda | MIT |
 | onnxruntime-gpu | MIT, with CUDA under NVIDIA's terms |
 
-Neither is installed by `requirements.txt` and neither is needed to run
-anything in this repository.
+None of these is installed by `requirements.txt` or needed to run the
+pipeline.  The desktop TensorRT measurement takes TensorRT and pycuda from
+NVIDIA's own `nvcr.io/nvidia/tensorrt` container (`docker/Dockerfile.tensorrt`)
+and CI installs NVIDIA's `tensorrt-cu12` wheel at run time
+(`requirements-tensorrt.txt`); nothing here redistributes them.
 
 ## Attribution
 

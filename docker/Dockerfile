@@ -2,7 +2,8 @@
 #
 # The AGPL-3.0 export toolchain deliberately does not appear here; see
 # docs/licences.md and docker/Dockerfile.export.  The result is an image whose
-# dependencies are all permissively licensed.
+# code dependencies are permissively licensed (python-can is LGPL-3.0); the
+# AGPL-3.0 weights are mounted at run time and keep their licence.
 #
 #   docker build -f docker/Dockerfile -t szp:latest .
 #   docker run --rm szp:latest                         # the demo

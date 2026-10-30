@@ -4,7 +4,8 @@
 # Deliberately absent from the runtime: torch and ultralytics.  The detector
 # runs on ONNX Runtime or TensorRT and never imports either.  Ultralytics is
 # AGPL-3.0 and is needed only to export the ONNX file; keeping it out of the
-# runtime keeps the deployed image MIT-compatible.  See docs/licences.md.
+# runtime keeps its code out of the deployed image.  The weights it exports are
+# still Ultralytics' AGPL-3.0 model.  See docs/licences.md.
 
 numpy>=1.26,<3
 scipy>=1.11,<2
