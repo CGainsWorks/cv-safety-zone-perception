@@ -6,21 +6,25 @@ drift from the measurements without the build going red.
 
 | File | Produced by | What it measures |
 |---|---|---|
-| `detection_val2017.json` | `analysis/detection_metrics.py` | person-detection recall and miss rate on COCO val2017, real photographs |
+| `detection_val2017.json` | `analysis/detection_metrics.py` | person-detection recall and miss rate on COCO val2017, real photographs, FP32 ONNX graph |
+| `detection_val2017_fp16.json`, `detection_val2017_int8.json` | `analysis/detection_metrics.py --model models/yolox_tiny_{fp16,int8}.onnx` | the same for the FP16 and INT8 ONNX graphs |
+| `quantisation.json` | `scripts/quantize_onnx.py` | how the INT8 ONNX graph was made: calibration set, excluded head nodes, size |
+| `detector_comparison.json` | `analysis/compare_detectors.py` | YOLOX-Tiny beside the YOLOv8n numbers it replaced, read from git history |
 | `geometry_accuracy.json` | `analysis/geometry_accuracy.py` | fusion position error and zone confusion on the synthetic cell, under sensor degradation |
 | `latency_onnx.json` | `analysis/latency_budget.py --detector onnx` | end-to-end latency with the real model in the loop |
 | `latency_simulated.json` | `analysis/latency_budget.py --detector simulated` | the same, with the model taken out, so everything else is visible |
 | `demo.json`, `demo_timeline.csv` | `scripts/run_demo.py` | the whole pipeline over the reference scene, with the state machine and the simulated PLC |
 | `calibration_self_check.json` | `scripts/calibrate.py --self-check` | how well the camera-lidar solver recovers a transform it was not told |
 | `benchmark.json` | `scripts/benchmark.py` | per-stage micro-benchmarks and the detector's warm-up curve |
-| `tensorrt.json` | `scripts/measure_tensorrt.py` (`make tensorrt-desktop`) | FP32 and FP16 TensorRT engines on a desktop RTX 4060: COCO recall and MR-2, pipeline latency, agreement with ONNX Runtime, versions and contention |
+| `tensorrt.json` | `scripts/measure_tensorrt.py` (`make tensorrt-desktop`) | FP32, FP16 and INT8 TensorRT engines on a desktop RTX 4060: COCO recall and MR-2, pipeline latency, agreement with ONNX Runtime, versions and contention |
 
 ## Regenerating them
 
 ```bash
 make model          # download and export the detector, once
 make data           # download COCO val2017, once, about 1.1 GB
-make experiments    # regenerates every file above
+make experiments    # regenerates every file above except the INT8 and TensorRT ones
+make int8           # the FP16 and INT8 graphs and their COCO scores
 ```
 
 `make experiments` takes a few minutes, most of it inference on the CPU.

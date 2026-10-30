@@ -1,0 +1,32 @@
+{
+  "onnx": "yolox_tiny_int8.onnx",
+  "source": "yolox_tiny.onnx",
+  "sha256": "bde41ddd575d5ab0178aa157b9afdea14050ee78646b5f76d775f9177782f1d3",
+  "bytes": 5658483,
+  "size_ratio": 0.2768,
+  "qdq_nodes": 418,
+  "output_shape": [
+    1,
+    84,
+    8400
+  ],
+  "quant_format": "QDQ",
+  "per_channel": true,
+  "calibrate_method": "MinMax",
+  "op_types_to_quantize": [
+    "Conv"
+  ],
+  "nodes_excluded": [
+    "/model/head/cls_preds.0/Conv",
+    "/model/head/cls_preds.1/Conv",
+    "/model/head/cls_preds.2/Conv",
+    "/model/head/obj_preds.0/Conv",
+    "/model/head/obj_preds.1/Conv",
+    "/model/head/obj_preds.2/Conv",
+    "/model/head/reg_preds.0/Conv",
+    "/model/head/reg_preds.1/Conv",
+    "/model/head/reg_preds.2/Conv"
+  ],
+  "calibration_split": "train2017",
+  "calibration_images": 256
+}

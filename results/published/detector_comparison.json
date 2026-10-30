@@ -1,0 +1,142 @@
+{
+  "note": "YOLOv8n numbers are results/published at the baseline commit; YOLOX-Tiny numbers are the current results/published.  delta is YOLOX-Tiny minus YOLOv8n.",
+  "baseline_ref": "8e5d88e",
+  "yolov8n": {
+    "model": "yolov8n.onnx",
+    "safety_subset": {
+      "mr2": 0.22660716112299895,
+      "recall_0.15": 0.8816568047337278,
+      "fp_per_image_0.15": 0.4192,
+      "recall_0.25": 0.8393913778529163,
+      "fp_per_image_0.25": 0.2098
+    },
+    "all": {
+      "mr2": 0.41608340382659004,
+      "recall_0.15": 0.726640066808945,
+      "fp_per_image_0.15": 0.4526,
+      "recall_0.25": 0.6692029321703629,
+      "fp_per_image_0.25": 0.2224
+    },
+    "missed_below_50px_fraction_015": 0.7145281737949762,
+    "miss_rate_by_height_015": {
+      "0-25px": 0.7603355302576393,
+      "100-200px": 0.10968028419182949,
+      "200-infpx": 0.04636542239685658,
+      "25-50px": 0.41592039800995023,
+      "50-100px": 0.20686657974793568
+    },
+    "onnx_cpu": {
+      "inference_p50_ms": 26.317950000000003,
+      "pipeline_p50_ms": 31.1098,
+      "pipeline_p99_ms": 36.841538
+    },
+    "tensorrt": {
+      "fp32": {
+        "recall_safety_015": 0.8812341504649197,
+        "mr2_safety": 0.22680280171562048,
+        "inference_p50_ms": 2.858,
+        "pipeline_p50_ms": 4.601
+      },
+      "fp16": {
+        "recall_safety_015": 0.8815159199774585,
+        "mr2_safety": 0.22667951308055018,
+        "inference_p50_ms": 2.239,
+        "pipeline_p50_ms": 3.993
+      }
+    }
+  },
+  "yolox_tiny": {
+    "model": "yolox_tiny.onnx",
+    "safety_subset": {
+      "mr2": 0.20539446101173806,
+      "recall_0.15": 0.8982812059735137,
+      "fp_per_image_0.15": 0.6672,
+      "recall_0.25": 0.8757396449704142,
+      "fp_per_image_0.25": 0.3706
+    },
+    "all": {
+      "mr2": 0.3770588201938113,
+      "recall_0.15": 0.7811079150041755,
+      "fp_per_image_0.15": 0.7262,
+      "recall_0.25": 0.7430639324487334,
+      "fp_per_image_0.25": 0.4004
+    },
+    "missed_below_50px_fraction_015": 0.6935142009325985,
+    "miss_rate_by_height_015": {
+      "0-25px": 0.6375074895146795,
+      "100-200px": 0.0994671403197158,
+      "200-infpx": 0.05343811394891945,
+      "25-50px": 0.2845771144278607,
+      "50-100px": 0.1577574967405476
+    },
+    "onnx_cpu": {
+      "inference_p50_ms": 31.255850000000002,
+      "pipeline_p50_ms": 35.980850000000004,
+      "pipeline_p99_ms": 46.15801100000001
+    },
+    "tensorrt": {
+      "fp32": {
+        "recall_safety_015": 0.8981403212172443,
+        "mr2_safety": 0.2054660567709629,
+        "inference_p50_ms": 3.163,
+        "pipeline_p50_ms": 4.974
+      },
+      "fp16": {
+        "recall_safety_015": 0.8982812059735137,
+        "mr2_safety": 0.20565992967479055,
+        "inference_p50_ms": 2.427,
+        "pipeline_p50_ms": 4.175
+      },
+      "int8": {
+        "recall_safety_015": 0.8734854888701042,
+        "mr2_safety": 0.23931306211963163,
+        "inference_p50_ms": 2.276,
+        "pipeline_p50_ms": 3.978
+      }
+    }
+  },
+  "delta": {
+    "model": null,
+    "safety_subset": {
+      "mr2": -0.02121,
+      "recall_0.15": 0.01662,
+      "fp_per_image_0.15": 0.248,
+      "recall_0.25": 0.03635,
+      "fp_per_image_0.25": 0.1608
+    },
+    "all": {
+      "mr2": -0.03902,
+      "recall_0.15": 0.05447,
+      "fp_per_image_0.15": 0.2736,
+      "recall_0.25": 0.07386,
+      "fp_per_image_0.25": 0.178
+    },
+    "missed_below_50px_fraction_015": -0.02101,
+    "miss_rate_by_height_015": {
+      "0-25px": -0.12283,
+      "100-200px": -0.01021,
+      "200-infpx": 0.00707,
+      "25-50px": -0.13134,
+      "50-100px": -0.04911
+    },
+    "onnx_cpu": {
+      "inference_p50_ms": 4.9379,
+      "pipeline_p50_ms": 4.87105,
+      "pipeline_p99_ms": 9.31647
+    },
+    "tensorrt": {
+      "fp32": {
+        "recall_safety_015": 0.01691,
+        "mr2_safety": -0.02134,
+        "inference_p50_ms": 0.305,
+        "pipeline_p50_ms": 0.373
+      },
+      "fp16": {
+        "recall_safety_015": 0.01677,
+        "mr2_safety": -0.02102,
+        "inference_p50_ms": 0.188,
+        "pipeline_p50_ms": 0.182
+      }
+    }
+  }
+}
