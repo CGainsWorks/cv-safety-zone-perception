@@ -74,8 +74,9 @@ Two separate bodies of evidence, kept apart on purpose.
 
 ### 1. Detection, on real photographs
 
-YOLOv8n exported to ONNX, run over **COCO val2017**: 5,000 images,
-**10,777** annotated people. Crowd regions are ignore regions, not misses.
+YOLOX-Tiny, Megvii's Apache-2.0 COCO checkpoint exported to ONNX, run over
+**COCO val2017**: 5,000 images, **10,777** annotated people. Crowd regions are
+ignore regions, not misses.
 
 ![detection](docs/figures/detection.png)
 
@@ -85,16 +86,34 @@ sensors cover anyway. Both are reported because the difference is the point.
 
 | At confidence | Recall, safety subset | Recall, whole set | False positives per image |
 |---|---|---|---|
-| 0.15 (the operating point) | **88.2 %** | 72.7 % | 0.42 / 0.45 |
-| 0.25 (the usual default) | 83.9 % | 66.9 % | 0.21 / 0.22 |
+| 0.15 (the operating point) | **89.8 %** | 78.1 % | 0.67 / 0.73 |
+| 0.25 (the usual default) | 87.6 % | 74.3 % | 0.37 / 0.40 |
 
-Log-average miss rate (MR-2, the standard pedestrian metric): **0.227** on the
-safety subset, 0.416 on the whole set.
+Log-average miss rate (MR-2, the standard pedestrian metric): **0.205** on the
+safety subset, 0.377 on the whole set.
 
-Where the misses are, at 0.15: **71 % of every missed person is under 50 px
-tall**. Above 200 px the miss rate is 5 %; between 25 and 50 px it is 42 %.
+Where the misses are, at 0.15: **69 % of every missed person is under 50 px
+tall**. Above 200 px the miss rate is 5 %; between 25 and 50 px it is 28 %.
 That is the shape a guarding application needs to know and it is the reason
 the operating point is where it is.
+
+**Against the YOLOv8n detector this replaced**, on the same images with the same
+code ([detector_comparison.json](results/published/detector_comparison.json)):
+recall on the safety subset at 0.15 is up from 88.2 % to 89.8 % and MR-2 down
+from 0.227 to 0.205, with the gain concentrated in small people (the 25 to 50
+px miss rate fell from 42 % to 28 %).  **It is worse on false positives**: 0.67
+per image at 0.15 against 0.42, so at the same threshold the guard would stop
+the machine for nobody about 60 per cent more often, which FM-19 in the FMEA
+treats as a safety issue because a guard that nuisance-trips gets bypassed.
+People taller than 200 px are missed slightly more often, 5.3 % against 4.6 %.
+The operating point was not re-chosen for the new detector; at 0.25 it is
+below YOLOv8n's nuisance rate at 0.15 (0.37 per image against 0.42) and still
+finds nearly as many people (87.6 % against 88.2 %).
+
+**Precision variants**, all on the same 5000 images, safety subset at 0.15:
+the FP16 ONNX graph matches FP32 (89.8 %, MR-2 0.206) and the INT8 ONNX graph,
+calibrated on 256 COCO train2017 images so the calibration and evaluation sets
+are disjoint, loses 3.7 points (86.1 %, MR-2 0.257).
 
 Reproduce: `make data && make detection`.
 
@@ -134,14 +153,16 @@ With the real ONNX model in the loop on a CPU:
 
 | | p50 | p99 |
 |---|---|---|
-| Pipeline: frame arrival to the frame on the bus | **31.1 ms** | 36.8 ms |
-| Reaction: the same, measured at the receiving PLC | 34.5 ms | **36.8 ms** |
-| Detector inference alone | 26.3 ms | 29.0 ms |
+| Pipeline: frame arrival to the frame on the bus | **36.0 ms** | 46.2 ms |
+| Reaction: the same, measured at the receiving PLC | 40.2 ms | **45.9 ms** |
+| Detector inference alone | 31.3 ms | 39.6 ms |
 
-The detector is **83 %** of the budget. Everything after it (fusion, zones,
+The detector is **87 %** of the budget. Everything after it (fusion, zones,
 the state machine, the CAN encode) is around two milliseconds together: with
 the model taken out entirely the p99 is 6.5 ms. Optimising this pipeline means
 optimising the detector and the measurements say so rather than intuition.
+YOLOX-Tiny is the larger network and costs about a fifth more on the CPU than
+the YOLOv8n it replaced (31.3 ms against 26.3 ms inference at p50).
 
 What is **not** in those numbers: camera exposure, driver latency and the PLC
 scan cycle, which on real hardware are often larger than everything above.
@@ -158,19 +179,32 @@ COCO code and timed through the same pipeline as the tables above.  The table
 is generated from `results/published/tensorrt.json`.
 
 <!-- BEGIN generated:tensorrt -->
-Measured on a desktop RTX 4060, not a Jetson.  Driver `591.86`, CUDA `12.9.1.010`, TensorRT `10.11.0.33`, image `nvcr.io/nvidia/tensorrt:25.06-py3` under WSL2 Docker.  GPU: no other compute process listed but utilisation reached 12 % in the idle windows before or after the run, above the 10 % threshold; this GPU also drives the desktop display (host nvidia-smi, sampled every 5 s through the run, listed no other compute process).  CPU not busy, load average 0.54 before and 1.08 after on 16 logical cores shared with other containers.  Recall on COCO val2017, 5000 images; latency over 29 entry events on python-can's `virtual` bus.
+Measured on a desktop RTX 4060, not a Jetson.  Driver `591.86`, CUDA `12.9.1.010`, TensorRT `10.11.0.33`, image `nvcr.io/nvidia/tensorrt:25.06-py3` under WSL2 Docker.  GPU: no other compute process, at most 5 % utilisation before and after (host nvidia-smi, sampled every 5 s through the run, listed no other compute process).  CPU not busy, load average 1.24 before and 1.21 after on 16 logical cores shared with other containers.  Recall on COCO val2017, 5000 images; latency over 29 entry events on python-can's `virtual` bus.
 
 | Detector | Recall, safety subset, 0.15 | Recall, safety subset, 0.25 | MR-2, safety subset | Inference p50 / p99 | Pipeline p50 / p99 | Reaction at the PLC p50 / p99 | Same detections as ONNX |
 |---|---|---|---|---|---|---|---|
-| TensorRT FP32 | 88.1 % | 84.0 % | 0.227 | 2.86 / 3.57 ms | 4.60 / 8.92 ms | 7.61 / 8.42 ms | yes |
-| TensorRT FP16 | 88.2 % | 83.9 % | 0.227 | 2.24 / 4.95 ms | 3.99 / 8.29 ms | 7.27 / 9.56 ms | yes |
-| ONNX Runtime, CPU (published) | 88.2 % | see above | 0.227 | 26.32 ms p50 | 31.11 ms p50 | see above | reference |
+| TensorRT FP32 | 89.8 % | 87.6 % | 0.205 | 3.16 / 3.98 ms | 4.97 / 8.82 ms | 8.06 / 11.09 ms | yes |
+| TensorRT FP16 | 89.8 % | 87.5 % | 0.206 | 2.43 / 5.17 ms | 4.17 / 7.96 ms | 7.27 / 7.96 ms | no, see below |
+| TensorRT INT8 | 87.3 % | 84.1 % | 0.239 | 2.28 / 4.83 ms | 3.98 / 8.23 ms | 6.93 / 7.59 ms | no, see below |
+| ONNX Runtime, CPU (published) | 89.8 % | see above | 0.205 | 31.26 ms p50 | 35.98 ms p50 | see above | reference |
+
+The box-for-box equivalence test on 16 COCO photographs with people in them is required of FP32 only; where an engine did not pass it, the first difference it found:
+
+* TensorRT FP16: AssertionError: image 7: ONNX found 6 people, TensorRT found 7
+* TensorRT INT8: AssertionError: image 0: boxes disagree
 <!-- END generated:tensorrt -->
 
-Recall does not move: the two engines find the same people as ONNX Runtime and
-the equivalence test passed on real photographs for both.  The detector stops
-being most of the budget: frame to bus falls from 31.1 ms to under 5 ms at p50.
-These are desktop numbers.  No Jetson was available, so the Xavier NX figure
+FP32 finds the same people as ONNX Runtime, box for box on the equivalence
+photographs and to within 0.0001 in recall on all 5000.  FP16 has the same
+recall to four decimal places but is not box-for-box identical: on one of the
+16 equivalence photographs a borderline person crosses the threshold, which is
+recorded under the table rather than tested away.  INT8, calibrated on COCO
+train2017, costs 2.5 points of safety-subset recall, less than the ONNX Runtime
+INT8 graph's 3.7 and is barely faster than FP16, so FP16 is the engine to
+deploy.  The detector stops being most of the budget: frame to bus falls from
+36.0 ms to under 5 ms at p50.  YOLOX-Tiny's engines are a little slower than
+YOLOv8n's were on the same GPU (3.16 ms against 2.86 ms at FP32).  These are
+desktop numbers.  No Jetson was available, so the Xavier NX figure
 is a hardware TODO in [STATUS.md](STATUS.md) and CI, which has no GPU, checks
 the TensorRT code against the pinned wheel without building an engine.
 [docs/tensorrt.md](docs/tensorrt.md) has the detail.
@@ -251,7 +285,7 @@ The long version, including what would be next and in what order:
 src/szp/
   types.py          the data between stages; coordinate frames defined once
   geometry.py       SE(3), strict about orthonormality
-  detection/        letterbox, YOLO decode, ONNX and TensorRT backends
+  detection/        letterbox, head decode, ONNX and TensorRT backends
   fusion/           depth ranging, scan segmentation, calibration, 3D boxes
   zones/            polygon geometry, the zone file format, occupancy
   safety/           CAN frame format, watchdog, fail-safe FSM, simulated PLC
@@ -275,17 +309,16 @@ deviation.
 
 The code is MIT, in [LICENSE](LICENSE).
 
-**The detector weights are AGPL-3.0.** They are Ultralytics' published COCO
-YOLOv8n checkpoint, converted to ONNX and not retrained, so any deployment with
-them must meet AGPL-3.0 and closed commercial use needs an Ultralytics
-Enterprise Licence or a different detector. The `ultralytics` package itself is
-used exactly once, by `scripts/fetch_model.py` and is in
-`requirements-export.txt` and not in `requirements.txt`. Nothing under `src/`
-imports it or torch and CI **fails the build** if either turns up in the
-runtime Docker image; that keeps Ultralytics' code out of the deployment but
-does not free the weights. [docs/licences.md](docs/licences.md) states the
-obligation. Swapping to an Apache-2.0 detector (YOLOX, RTMDet or D-FINE) is an
-open item in [STATUS.md](STATUS.md).
+**The detector weights are Apache-2.0.** They are Megvii's YOLOX-Tiny COCO
+checkpoint, exported to ONNX and not retrained and YOLOX's code is Apache-2.0
+too, so closed commercial use is permitted.  They replaced Ultralytics' YOLOv8n,
+whose AGPL-3.0 obligation blocked it.  torch and yolox are used once, by
+`scripts/fetch_model.py` and are in `requirements-export.txt` and
+`requirements-yolox.txt`, not in `requirements.txt`; CI **fails the build** if
+torch, yolox or ultralytics turns up in the runtime Docker image.
+[docs/licences.md](docs/licences.md) has the licence position, why YOLOX rather
+than RTMDet or D-FINE and the one point worth confirming with counsel;
+[docs/MODEL_CARD.md](docs/MODEL_CARD.md) has the model.
 
 Datasets and their terms: [data/DATASET_CARD.md](data/DATASET_CARD.md). Nothing
 is redistributed by this repository and nothing here is trained.
