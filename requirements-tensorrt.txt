@@ -1,0 +1,12 @@
+# The TensorRT Python wheel the CI `tensorrt-api` job checks the TensorRT code
+# path against.  It is the TensorRT inside nvcr.io/nvidia/tensorrt:25.06-py3
+# (docker/Dockerfile.tensorrt), the image that produced
+# results/published/tensorrt.json, so a symbol that disappears from this pin
+# fails CI before it fails an engine build.
+#
+# A hosted runner has no GPU.  The wheel imports there but trt.Builder aborts
+# the process with CUDA error 35, so CI cannot build a network definition or an
+# engine; docs/tensorrt.md lists that as a manual step.  The libs package is a
+# stub that fetches about 2 GB from pypi.nvidia.com.
+
+tensorrt-cu12==10.11.0.33
